@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BellRing, ChartNoAxesColumnIncreasing, CheckCircle2, Leaf, LockKeyhole, ShoppingBasket, Sparkles } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { PublicNavbar } from "@/components/navigation/PublicNavbar";
 import { formatCurrency } from "@/lib/currency";
 
 const features = [
@@ -13,23 +14,10 @@ const features = [
 export default function LandingPage() {
   return (
     <div className="landing-shell">
-      <header className="landing-header">
-        <Logo />
-        <nav>
-          <a href="#features">Features</a>
-          <a href="#how">How it works</a>
-          <Link href="/support">Support</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/food-safety">Food Safety</Link>
-        </nav>
-        <div className="landing-actions">
-          <Link className="button button-ghost" href="/login">Sign in</Link>
-          <Link className="button button-primary" href="/signup">Get started</Link>
-        </div>
-      </header>
+      <PublicNavbar />
 
       <main>
-        <section className="hero-section">
+        <section className="hero-section" id="hero">
           <div className="hero-copy">
             <span className="hero-kicker"><Leaf size={16} /> Practical food tracking for real homes</span>
             <h1>Stop forgetting food in your fridge.</h1>
