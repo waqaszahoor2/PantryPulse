@@ -77,7 +77,7 @@ function pantryToRow(input: PantryItemInput) {
 
 export function PantryProvider({ children }: { children: ReactNode }) {
   const requestedMode = process.env.NEXT_PUBLIC_DATA_MODE === "supabase" ? "supabase" : "demo";
-  const mode = requestedMode === "supabase" && isSupabaseConfigured() ? "supabase" : "demo";
+  const mode = (requestedMode === "supabase" && isSupabaseConfigured() ? "supabase" : "demo") as "supabase" | "demo";
   const [items, setItems] = useState<PantryItem[]>(samplePantryItems);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>(sampleShoppingItems);
   const [notifications, setNotifications] = useState<AppNotification[]>(sampleNotifications);
