@@ -13,7 +13,7 @@ const schema = z.object({
   email: z.string().email("Enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters."),
   householdSize: z.number().int().min(1, "Minimum household size is 1.").max(30, "Maximum household size is 30."),
-  consent: z.literal(true, { errorMap: () => ({ message: "You must accept the terms, privacy policy, and food safety advice." }) }),
+  consent: z.literal(true, { errorMap: () => ({ message: "You must agree to the terms, privacy policy, and food safety advice before creating an account." }) }),
 });
 
 export default function SignupPage() {
@@ -27,6 +27,12 @@ export default function SignupPage() {
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setErrorMessage("");
+
+    if (!form.consent) {
+      setErrorMessage("Please check the box to agree to the terms, privacy policy, and food safety disclaimer.");
+      return;
+    }
+
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       setErrorMessage(parsed.error.issues[0]?.message ?? "Check your information.");
@@ -174,15 +180,29 @@ export default function SignupPage() {
           </label>
 
           <label className="checkbox-row">
-            <input type="checkbox" required checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
+            <input
+              type="checkbox"
+              required
+              checked={form.consent}
+              onChange={(e) => {
+                setForm({ ...form, consent: e.target.checked });
+                if (e.target.checked) setErrorMessage("");
+              }}
+            />
             <span>
               I agree to the <Link href="/terms" target="_blank" className="link-text">Terms of Service</Link>, <Link href="/privacy" target="_blank" className="link-text">Privacy Policy</Link>, and <Link href="/food-safety" target="_blank" className="link-text">Food Safety Disclaimer</Link>.
             </span>
           </label>
 
-          <button className="button button-primary button-full" disabled={loading}>
+          <button className="button button-primary button-full" disabled={loading || !form.consent}>
             {loading ? "Creating account…" : "Create account"}
           </button>
+
+          {!form.consent && (
+            <p className="muted" style={{ fontSize: "0.78rem", textAlign: "center", marginTop: "0.35rem" }}>
+              Please check the box above to accept the terms before creating an account.
+            </p>
+          )}
 
           <p className="auth-switch">
             Already registered? <Link href="/login">Sign in</Link>
