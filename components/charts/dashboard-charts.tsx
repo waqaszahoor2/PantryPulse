@@ -1,12 +1,34 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Bar, BarChart } from "recharts";
 import { usePantry } from "@/lib/data/provider";
 import { formatCurrency } from "@/lib/currency";
 
+function useChartColors() {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    function update() {
+      const current = document.documentElement.getAttribute("data-theme");
+      setIsDark(current === "dark");
+    }
+    update();
+    window.addEventListener("themechange", update);
+    return () => window.removeEventListener("themechange", update);
+  }, []);
+
+  return {
+    textColor: isDark ? "#a9c2b3" : "#3b5247",
+    gridColor: isDark ? "#253a2b" : "#dce6de",
+    tooltipBg: isDark ? "#131d17" : "#ffffff",
+    tooltipText: isDark ? "#edf8f1" : "#0d1f15",
+  };
+}
+
 export function OutcomeChart() {
-  const { items, profile } = usePantry();
+  const { items } = usePantry();
+  const colors = useChartColors();
 
   const data = useMemo(() => {
     const consumed = items.filter((i) => i.status === "consumed").length;
@@ -17,7 +39,7 @@ export function OutcomeChart() {
     const total = consumed + wasted + donated + available;
     if (total === 0) {
       return [
-        { name: "Available", value: 1, color: "#d9e2dc", formatted: "No items" },
+        { name: "Available", value: 1, color: colors.gridColor, formatted: "No items" },
       ];
     }
 
@@ -27,7 +49,7 @@ export function OutcomeChart() {
       { name: "Donated", value: donated, color: "#7c5ce7", formatted: `${donated} items` },
       { name: "Available", value: available, color: "#22a6b3", formatted: `${available} items` },
     ].filter((d) => d.value > 0);
-  }, [items]);
+  }, [items, colors.gridColor]);
 
   const totalResolved = items.filter((i) => i.status === "consumed" || i.status === "wasted" || i.status === "expired").length;
   const totalConsumed = items.filter((i) => i.status === "consumed").length;
@@ -43,7 +65,10 @@ export function OutcomeChart() {
                 <Cell key={entry.name} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(val: number) => [`${val} items`, "Quantity"]} />
+            <Tooltip
+              contentStyle={{ background: colors.tooltipBg, color: colors.tooltipText, borderRadius: "10px", borderColor: colors.gridColor }}
+              formatter={(val: number) => [`${val} items`, "Quantity"]}
+            />
           </PieChart>
         </ResponsiveContainer>
         <span className="donut-center">
@@ -55,7 +80,7 @@ export function OutcomeChart() {
         {data.map((entry) => (
           <div key={entry.name}>
             <span style={{ background: entry.color }} />
-            <p>{entry.name}</p>
+            <p style={{ color: colors.textColor }}>{entry.name}</p>
             <strong>{entry.value}</strong>
           </div>
         ))}
@@ -65,23 +90,12 @@ export function OutcomeChart() {
 }
 
 export function WeeklyWasteChart() {
-  const { items, events } = usePantry();
+  const { items } = usePantry();
+  const colors = useChartColors();
 
   const data = useMemo(() => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const counts = [0, 0, 0, 0, 0, 0, 0];
-
     const today = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      const dateStr = d.toISOString().slice(0, 10);
-      const dayIdx = d.getDay();
-
-      const wasteCount = items.filter((item) => (item.status === "wasted" || item.status === "expired") && item.statusDate === dateStr).length;
-      counts[dayIdx] += wasteCount;
-    }
-
     const result = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -97,11 +111,14 @@ export function WeeklyWasteChart() {
   return (
     <ResponsiveContainer width="100%" height={210}>
       <LineChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8eee9" />
-        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#748079" }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#748079" }} allowDecimals={false} />
-        <Tooltip formatter={(val: number) => [`${val} items wasted`, "Waste"]} />
-        <Line type="monotone" dataKey="waste" stroke="#168b5b" strokeWidth={2.4} dot={{ r: 3, fill: "#fff", strokeWidth: 2 }} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.gridColor} />
+        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: colors.textColor }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: colors.textColor }} allowDecimals={false} />
+        <Tooltip
+          contentStyle={{ background: colors.tooltipBg, color: colors.tooltipText, borderRadius: "10px", borderColor: colors.gridColor }}
+          formatter={(val: number) => [`${val} items wasted`, "Waste"]}
+        />
+        <Line type="monotone" dataKey="waste" stroke="#168b5b" strokeWidth={2.4} dot={{ r: 3, fill: colors.tooltipBg, strokeWidth: 2 }} />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -109,6 +126,7 @@ export function WeeklyWasteChart() {
 
 export function CategoryWasteChart() {
   const { items } = usePantry();
+  const colors = useChartColors();
 
   const data = useMemo(() => {
     const map: Record<string, number> = {};
@@ -128,10 +146,13 @@ export function CategoryWasteChart() {
   return (
     <ResponsiveContainer width="100%" height={250}>
       <BarChart data={data} layout="vertical" margin={{ left: 4, right: 18 }}>
-        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e8eee9" />
-        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#748079" }} allowDecimals={false} />
-        <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={96} tick={{ fontSize: 12, fill: "#4a554f" }} />
-        <Tooltip formatter={(val: number) => [`${val} items`, "Wasted"]} />
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={colors.gridColor} />
+        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: colors.textColor }} allowDecimals={false} />
+        <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={96} tick={{ fontSize: 12, fill: colors.textColor }} />
+        <Tooltip
+          contentStyle={{ background: colors.tooltipBg, color: colors.tooltipText, borderRadius: "10px", borderColor: colors.gridColor }}
+          formatter={(val: number) => [`${val} items`, "Wasted"]}
+        />
         <Bar dataKey="value" fill="#dc4c4c" radius={[0, 6, 6, 0]} />
       </BarChart>
     </ResponsiveContainer>
@@ -140,6 +161,7 @@ export function CategoryWasteChart() {
 
 export function MoneySavedVsLostChart() {
   const { items, profile } = usePantry();
+  const colors = useChartColors();
   const userCurrency = profile?.currency || "USD";
 
   const data = useMemo(() => {
@@ -155,10 +177,13 @@ export function MoneySavedVsLostChart() {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8eee9" />
-        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: "#4a554f" }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#748079" }} />
-        <Tooltip formatter={(val: number) => [formatCurrency(val, userCurrency), "Amount"]} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.gridColor} />
+        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: colors.textColor }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: colors.textColor }} />
+        <Tooltip
+          contentStyle={{ background: colors.tooltipBg, color: colors.tooltipText, borderRadius: "10px", borderColor: colors.gridColor }}
+          formatter={(val: number) => [formatCurrency(val, userCurrency), "Amount"]}
+        />
         <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
           {data.map((entry) => (
             <Cell key={entry.name} fill={entry.fill} />
