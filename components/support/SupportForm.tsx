@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { Check, Copy, Mail, ExternalLink, AlertCircle, Info } from "lucide-react";
+import { useId, useState } from "react";
+import { AlertCircle, Check, Copy, ExternalLink, Mail } from "lucide-react";
 import {
   SUPPORT_CATEGORIES,
   buildGmailComposeUrl,
   buildMailtoUrl,
   getFixedSupportEmail,
+  isConfiguredSupportEmail,
 } from "@/lib/support/build-email-links";
 
 interface FormState {
@@ -27,6 +28,7 @@ interface ErrorsState {
 
 export function SupportForm() {
   const supportEmail = getFixedSupportEmail();
+  const isEmailConfigured = isConfiguredSupportEmail(supportEmail);
 
   const [form, setForm] = useState<FormState>({
     fullName: "",
@@ -38,9 +40,7 @@ export function SupportForm() {
 
   const [errors, setErrors] = useState<ErrorsState>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [notice, setNotice] = useState<{ text: string; type: "info" | "error" } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fullNameId = useId();
   const emailId = useId();
@@ -109,51 +109,6 @@ export function SupportForm() {
     setErrors(validate(form));
   }
 
-  function handleOpenGmail(e: React.FormEvent) {
-    e.preventDefault();
-    setTouched({ fullName: true, email: true, category: true, subject: true, message: true });
-    const validationErrors = validate(form);
-    setErrors(validationErrors);
-
-    if (Object.keys(validationErrors).length > 0) {
-      setNotice({ text: "Please correct the validation errors above before proceeding.", type: "error" });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setNotice(null);
-
-    try {
-      const gmailUrl = buildGmailComposeUrl({
-        fullName: form.fullName,
-        email: form.email,
-        category: form.category,
-        subject: form.subject,
-        message: form.message,
-      });
-
-      const win = window.open(gmailUrl, "_blank", "noopener,noreferrer");
-      if (win) {
-        setNotice({
-          text: "Gmail has been opened with your message. Review the email and press Send.",
-          type: "info",
-        });
-      } else {
-        setNotice({
-          text: "We could not open Gmail. Use the alternative email button or contact support directly.",
-          type: "error",
-        });
-      }
-    } catch {
-      setNotice({
-        text: "We could not open Gmail. Use the alternative email button or contact support directly.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   function handleCopyEmail() {
     navigator.clipboard.writeText(supportEmail).then(() => {
       setCopied(true);
@@ -161,31 +116,46 @@ export function SupportForm() {
     });
   }
 
-  const mailtoUrl = buildMailtoUrl({
-    fullName: form.fullName,
-    email: form.email,
-    category: form.category,
-    subject: form.subject,
-    message: form.message,
-  });
+  const currentErrors = validate(form);
+  const isFormValid = isEmailConfigured && Object.keys(currentErrors).length === 0;
 
-  const isFormValid = Object.keys(validate(form)).length === 0;
+  const gmailUrl = isFormValid
+    ? buildGmailComposeUrl({
+        recipient: supportEmail,
+        fullName: form.fullName,
+        email: form.email,
+        category: form.category,
+        subject: form.subject,
+        message: form.message,
+      })
+    : "#";
+
+  const mailtoUrl = isFormValid
+    ? buildMailtoUrl({
+        recipient: supportEmail,
+        fullName: form.fullName,
+        email: form.email,
+        category: form.category,
+        subject: form.subject,
+        message: form.message,
+      })
+    : "#";
 
   return (
     <div className="support-form-container" style={{ display: "grid", gap: "1.25rem" }}>
-      {notice && (
+      {!isEmailConfigured && (
         <div
           role="status"
           aria-live="polite"
-          className={`form-message ${notice.type === "error" ? "error" : "success"}`}
+          className="form-message error"
           style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}
         >
-          {notice.type === "error" ? <AlertCircle size={18} /> : <Info size={18} />}
-          <span>{notice.text}</span>
+          <AlertCircle size={18} />
+          <span>Support email is not configured. Please contact the site administrator.</span>
         </div>
       )}
 
-      <form onSubmit={handleOpenGmail} noValidate style={{ display: "grid", gap: "1rem" }}>
+      <form noValidate style={{ display: "grid", gap: "1rem" }} onSubmit={(e) => e.preventDefault()}>
         <div className="form-grid two">
           <div className="field">
             <label htmlFor={fullNameId}>
@@ -313,28 +283,49 @@ export function SupportForm() {
         </div>
 
         <p className="muted" style={{ fontSize: "0.82rem", margin: "0.35rem 0" }}>
-          Your email application will open with your message prepared. Review it and press Send to deliver your query.
+          Gmail will open with your message prepared. Review it and press Send.
         </p>
 
         <div className="support-actions" style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <button
-            type="submit"
-            className="button button-primary"
-            disabled={isSubmitting || !isFormValid}
-            style={{ minHeight: "44px" }}
-          >
-            <Mail size={18} />
-            {isSubmitting ? "Preparing Gmail…" : "Send query with Gmail"}
-          </button>
+          {isFormValid ? (
+            <a
+              href={gmailUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button button-primary"
+              style={{ minHeight: "44px", textDecoration: "none" }}
+            >
+              <Mail size={18} /> Send query with Gmail
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="button button-primary"
+              style={{ minHeight: "44px" }}
+            >
+              <Mail size={18} /> Send query with Gmail
+            </button>
+          )}
 
-          <a
-            href={mailtoUrl}
-            className={`button button-soft ${!isFormValid ? "disabled" : ""}`}
-            style={{ minHeight: "44px", opacity: !isFormValid ? 0.5 : 1, pointerEvents: !isFormValid ? "none" : "auto" }}
-          >
-            <ExternalLink size={18} />
-            Use another email app
-          </a>
+          {isFormValid ? (
+            <a
+              href={mailtoUrl}
+              className="button button-soft"
+              style={{ minHeight: "44px", textDecoration: "none" }}
+            >
+              <ExternalLink size={18} /> Use another email app
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="button button-soft"
+              style={{ minHeight: "44px", opacity: 0.5 }}
+            >
+              <ExternalLink size={18} /> Use another email app
+            </button>
+          )}
         </div>
       </form>
 

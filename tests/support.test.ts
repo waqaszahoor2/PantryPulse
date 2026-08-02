@@ -5,6 +5,7 @@ import {
   buildGmailComposeUrl,
   buildMailtoUrl,
   getFixedSupportEmail,
+  isConfiguredSupportEmail,
 } from "@/lib/support/build-email-links";
 
 describe("Support Email Links Generator", () => {
@@ -27,6 +28,13 @@ describe("Support Email Links Generator", () => {
     expect(getFixedSupportEmail()).toBe("support@example.com");
   });
 
+  it("validates configured support email addresses correctly", () => {
+    expect(isConfiguredSupportEmail("valid@pantrypulse.app")).toBe(true);
+    expect(isConfiguredSupportEmail("support@example.com")).toBe(false);
+    expect(isConfiguredSupportEmail("")).toBe(false);
+    expect(isConfiguredSupportEmail("invalid-email")).toBe(false);
+  });
+
   it("formats the email subject correctly with category and subject", () => {
     const subject = buildEmailSubject("Account problem", "Cannot reset password");
     expect(subject).toBe("[PantryPulse Support] Account problem: Cannot reset password");
@@ -47,11 +55,11 @@ describe("Support Email Links Generator", () => {
     expect(body).toContain("Category: Pantry problem");
     expect(body).toContain("Subject: Item expiry date issue");
     expect(body).toContain("First line of issue.\nSecond line of details.");
-    expect(body).toContain("Page:\nhttps://pantrypulse.app/pantry");
+    expect(body).toContain("Page: https://pantrypulse.app/pantry");
     expect(body).toContain("Sent from the PantryPulse support form.");
   });
 
-  it("generates a safe, fully-encoded Gmail compose URL", () => {
+  it("generates a safe, fully-encoded Gmail compose URL using URLSearchParams", () => {
     const gmailUrl = buildGmailComposeUrl({
       fullName: "John & Smith",
       email: "john@example.com",
@@ -60,12 +68,14 @@ describe("Support Email Links Generator", () => {
       message: "Loved the PKR currency support & analytics = 100%!",
     });
 
-    expect(gmailUrl).toContain("https://mail.google.com/mail/?");
-    expect(gmailUrl).toContain("view=cm");
-    expect(gmailUrl).toContain("fs=1");
-    expect(gmailUrl).toContain("to=fixed-support%40pantrypulse.app");
-    expect(gmailUrl).toContain("su=%5BPantryPulse+Support%5D+General+feedback%3A+Great+app%21");
-    expect(gmailUrl).toContain("Loved+the+PKR+currency");
+    const parsed = new URL(gmailUrl);
+    expect(parsed.origin).toBe("https://mail.google.com");
+    expect(parsed.pathname).toBe("/mail/");
+    expect(parsed.searchParams.get("view")).toBe("cm");
+    expect(parsed.searchParams.get("fs")).toBe("1");
+    expect(parsed.searchParams.get("to")).toBe("fixed-support@pantrypulse.app");
+    expect(parsed.searchParams.get("su")).toBe("[PantryPulse Support] General feedback: Great app!");
+    expect(parsed.searchParams.get("body")).toContain("Loved the PKR currency support & analytics = 100%!");
   });
 
   it("generates a safe mailto URL fallback", () => {
@@ -92,7 +102,7 @@ describe("Support Email Links Generator", () => {
     });
 
     expect(gmailUrl).not.toContain("<script>");
-    expect(gmailUrl).toContain("%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E");
-    expect(gmailUrl).toContain("Special+%3F+%3D+%23+%25+Characters");
+    const parsed = new URL(gmailUrl);
+    expect(parsed.searchParams.get("body")).toContain("<script>alert('xss')</script>");
   });
 });
