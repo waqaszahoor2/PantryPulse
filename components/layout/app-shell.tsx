@@ -3,7 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Camera, ChartNoAxesColumnIncreasing, CirclePlus, ClipboardList, Gauge, Globe, Household, Lightbulb, LogOut, Mail, Menu, PackageSearch, Search, Settings, ShoppingBasket, User, UserCheck, Users, X } from "lucide-react";
+import { Bell, Camera, ChartNoAxesColumnIncreasing, CirclePlus, ClipboardList, Gauge, Globe, Home, Lightbulb, LogOut, Mail, Menu, PackageSearch, Search, Settings, ShoppingBasket, User, UserCheck, Users, X } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationPermission } from "@/components/notifications/notification-permission";
