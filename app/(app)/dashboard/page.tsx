@@ -32,6 +32,8 @@ function formatEventTime(isoString: string): string {
   }
 }
 
+import { AppPageContainer } from "@/components/layout/containers";
+
 export default function DashboardPage() {
   const { items, events, loading, markStatus, profile } = usePantry();
   useExpiryNotifications(items);
@@ -65,7 +67,7 @@ export default function DashboardPage() {
   const recentEvents = events.slice(0, 5);
 
   return (
-    <div className="page-stack">
+    <AppPageContainer className="page-stack">
       <section className="page-heading-row">
         <div>
           <p className="eyebrow">{dateFormatted || "Today's overview"}</p>
@@ -223,6 +225,6 @@ export default function DashboardPage() {
       <p className="safety-note">
         <TriangleAlert size={15} /> PantryPulse provides planning estimates only. Always follow package labels and official food-safety guidance.
       </p>
-    </div>
+    </AppPageContainer>
   );
 }

@@ -15,16 +15,45 @@ import { DemoSidebar } from "@/components/navigation/DemoSidebar";
 import { DemoMobileNav } from "@/components/navigation/DemoMobileNav";
 import { HeaderBackButton } from "@/components/ui/header-back-button";
 import { PantryPageHeader } from "@/components/pantry/pantry-page-header";
+import { FilterPanel } from "@/components/pantry/filter-panel";
+import { useMemo } from "react";
 
 function DemoContent() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "pantry" | "recommendations" | "insights">("dashboard");
   const [items, setItems] = useState(samplePantryItems);
+
+  const [demoQuery, setDemoQuery] = useState("");
+  const [demoCategory, setDemoCategory] = useState("All");
+  const [demoStorage, setDemoStorage] = useState("All");
+  const [demoRisk, setDemoRisk] = useState("All");
+  const [demoSort, setDemoSort] = useState<"expiry" | "name" | "price">("expiry");
+  const [demoView, setDemoView] = useState<"grid" | "list">("grid");
 
   const available = items.filter((i) => i.status === "available");
   const ranked = available.map((item) => ({
     item,
     risk: calculateRisk(item, available.filter((other) => other.id !== item.id && other.productName.toLowerCase() === item.productName.toLowerCase()).length),
   })).sort((a, b) => b.risk.score - a.risk.score);
+
+  const filteredDemoItems = useMemo(() => {
+    return available
+      .filter((item) => {
+        if (demoCategory !== "All" && item.category !== demoCategory) return false;
+        if (demoStorage !== "All" && item.storageLocation !== demoStorage) return false;
+        if (demoQuery.trim() && !item.productName.toLowerCase().includes(demoQuery.toLowerCase())) return false;
+        if (demoRisk !== "All") {
+          const r = calculateRisk(item);
+          if (r.level !== demoRisk.toLowerCase()) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (demoSort === "expiry") return a.expiryDate.localeCompare(b.expiryDate);
+        if (demoSort === "name") return a.productName.localeCompare(b.productName);
+        if (demoSort === "price") return b.price - a.price;
+        return 0;
+      });
+  }, [available, demoCategory, demoStorage, demoQuery, demoRisk, demoSort]);
 
   const expiringSoon = ranked.filter(({ risk }) => risk.daysRemaining >= 0 && risk.daysRemaining <= 3).length;
   const atRiskValue = ranked.filter(({ risk }) => risk.level === "high" || risk.level === "expired").reduce((sum, { item }) => sum + item.price, 0);
@@ -194,8 +223,29 @@ function DemoContent() {
           {activeTab === "pantry" && (
             <div className="page-stack">
               <PantryPageHeader count={available.length} isDemo onDemoAdd={addDemoItem} />
-              <div className="product-grid">
-                {available.map((item) => {
+              <FilterPanel
+                query={demoQuery}
+                onQueryChange={setDemoQuery}
+                category={demoCategory}
+                onCategoryChange={setDemoCategory}
+                storage={demoStorage}
+                onStorageChange={setDemoStorage}
+                riskFilter={demoRisk}
+                onRiskFilterChange={setDemoRisk}
+                sortBy={demoSort}
+                onSortByChange={setDemoSort}
+                view={demoView}
+                onViewChange={setDemoView}
+                onResetFilters={() => {
+                  setDemoQuery("");
+                  setDemoCategory("All");
+                  setDemoStorage("All");
+                  setDemoRisk("All");
+                  setDemoSort("expiry");
+                }}
+              />
+              <div className={demoView === "grid" ? "product-grid" : "product-list-view"}>
+                {filteredDemoItems.map((item) => {
                   const risk = calculateRisk(item);
                   return (
                     <article key={item.id} className="panel product-card">

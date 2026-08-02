@@ -1,17 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { CirclePlus, Grid2X2, List, PackageSearch, Search } from "lucide-react";
-import { CATEGORIES, STORAGE_LOCATIONS } from "@/lib/constants";
+import { PackageSearch } from "lucide-react";
 import { usePantry } from "@/lib/data/provider";
 import type { PantryItem, PantryStatus } from "@/lib/types";
 import { ProductCard } from "@/components/pantry/product-card";
 import { ItemEditor } from "@/components/pantry/item-editor";
 import { EmptyState } from "@/components/ui/empty-state";
 import { calculateRisk } from "@/lib/risk";
-
 import { PantryPageHeader } from "@/components/pantry/pantry-page-header";
+import { FilterPanel } from "@/components/pantry/filter-panel";
+import { AppPageContainer } from "@/components/layout/containers";
 
 export default function PantryPage() {
   const { items, updateItem, deleteItem, markStatus } = usePantry();
@@ -45,6 +44,14 @@ export default function PantryPage() {
       });
   }, [available, category, storage, query, riskFilter, sortBy]);
 
+  function resetFilters() {
+    setQuery("");
+    setCategory("All");
+    setStorage("All");
+    setRiskFilter("All");
+    setSortBy("expiry");
+  }
+
   async function confirmDelete(item: PantryItem) {
     if (window.confirm(`Delete ${item.productName}? This will permanently remove it from your pantry records.`)) {
       await deleteItem(item.id);
@@ -61,52 +68,24 @@ export default function PantryPage() {
   }
 
   return (
-    <div className="page-stack">
+    <AppPageContainer className="page-stack">
       <PantryPageHeader count={available.length} />
 
-      <section className="filter-panel">
-        <label className="filter-search">
-          <Search size={17} />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products by name…" />
-        </label>
-
-        <select aria-label="Category filter" value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((value) => (
-            <option key={value} value={value}>{value}</option>
-          ))}
-        </select>
-
-        <select aria-label="Storage filter" value={storage} onChange={(e) => setStorage(e.target.value)}>
-          <option value="All">All Storage Locations</option>
-          {STORAGE_LOCATIONS.map((value) => (
-            <option key={value} value={value}>{value}</option>
-          ))}
-        </select>
-
-        <select aria-label="Risk filter" value={riskFilter} onChange={(e) => setRiskFilter(e.target.value)}>
-          <option value="All">All Risk Levels</option>
-          <option value="high">High Risk</option>
-          <option value="medium">Medium Risk</option>
-          <option value="low">Low Risk</option>
-          <option value="expired">Expired</option>
-        </select>
-
-        <select aria-label="Sort by" value={sortBy} onChange={(e) => setSortBy(e.target.value as "expiry" | "name" | "price")}>
-          <option value="expiry">Sort by Expiry Date</option>
-          <option value="name">Sort by Name</option>
-          <option value="price">Sort by Price</option>
-        </select>
-
-        <div className="view-toggle">
-          <button className={view === "grid" ? "active" : ""} onClick={() => setView("grid")} aria-label="Grid view">
-            <Grid2X2 size={17} />
-          </button>
-          <button className={view === "list" ? "active" : ""} onClick={() => setView("list")} aria-label="List view">
-            <List size={17} />
-          </button>
-        </div>
-      </section>
+      <FilterPanel
+        query={query}
+        onQueryChange={setQuery}
+        category={category}
+        onCategoryChange={setCategory}
+        storage={storage}
+        onStorageChange={setStorage}
+        riskFilter={riskFilter}
+        onRiskFilterChange={setRiskFilter}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        view={view}
+        onViewChange={setView}
+        onResetFilters={resetFilters}
+      />
 
       {filtered.length > 0 ? (
         <section className={view === "grid" ? "product-grid" : "product-list-view"}>
@@ -125,13 +104,13 @@ export default function PantryPage() {
         <EmptyState
           icon={PackageSearch}
           title="No matching groceries"
-          description="Try adjusting your search terms or filters, or add a new item."
+          description="Try adjusting your search terms or filters, or add a new grocery item to your pantry."
           action="Add grocery"
           href="/add-item"
         />
       )}
 
       <ItemEditor item={editing} onClose={() => setEditing(null)} onSave={updateItem} />
-    </div>
+    </AppPageContainer>
   );
 }
