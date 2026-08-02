@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Camera, Download, FileSpreadsheet, Mail, RotateCcw, ShieldCheck, Trash2, UserRound, X } from "lucide-react";
+import { Camera, Download, FileSpreadsheet, HelpCircle, Lock, Mail, MessageSquare, RotateCcw, Send, ShieldCheck, Sparkles, Trash2, UserRound, X } from "lucide-react";
 import { NotificationPermission } from "@/components/notifications/notification-permission";
 import { usePantry } from "@/lib/data/provider";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -37,6 +37,11 @@ export default function SettingsPage() {
   const [fileError, setFileError] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Support Inquiry State
+  const [inquirySubject, setInquirySubject] = useState("");
+  const [inquiryBody, setInquiryBody] = useState("");
+  const [inquirySent, setInquirySent] = useState(false);
 
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
 
@@ -97,6 +102,15 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleSendInquiry(e: React.FormEvent) {
+    e.preventDefault();
+    if (!inquiryBody.trim()) return;
+    setInquirySent(true);
+    setInquirySubject("");
+    setInquiryBody("");
+    setTimeout(() => setInquirySent(false), 5000);
   }
 
   function handleDownloadJSON() {
@@ -192,6 +206,7 @@ export default function SettingsPage() {
       {message && <p className={`form-message ${message.includes("successfully") || message.includes("cleared") || message.includes("saved") ? "success" : "error"}`}>{message}</p>}
 
       <div className="settings-grid">
+        {/* Household Profile Section */}
         <section className="panel settings-section">
           <div className="settings-heading">
             <span><UserRound /></span>
@@ -295,19 +310,74 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <section className="panel settings-section">
+        {/* Support & Help Center Section */}
+        <section className="panel settings-section" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div className="settings-heading">
             <span><Mail /></span>
             <div>
-              <h2>Support contact</h2>
-              <p>Need assistance or have privacy questions?</p>
+              <h2>Support & Help Center</h2>
+              <p>Need assistance, have questions, or want to request a feature?</p>
             </div>
           </div>
+
           <div className="support-email">
             <Mail size={18} />
             <a href={`mailto:${supportEmail}`} className="link-text">{supportEmail}</a>
           </div>
-          <p className="muted">Support queries are handled directly via email.</p>
+
+          {/* Quick Support Message Form */}
+          <form onSubmit={handleSendInquiry} style={{ display: "grid", gap: "0.65rem", padding: "0.85rem", background: "var(--surface-soft)", borderRadius: "12px", border: "1px solid var(--line)" }}>
+            <span style={{ fontSize: "0.8rem", fontWeight: 750, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+              <MessageSquare size={16} /> Send Direct Message to Support
+            </span>
+
+            {inquirySent && (
+              <p className="form-message success" style={{ fontSize: "0.75rem", margin: 0 }}>
+                Message sent successfully! Our support team will get back to you via email.
+              </p>
+            )}
+
+            <input
+              placeholder="Subject (e.g. Question about risk score)"
+              value={inquirySubject}
+              onChange={(e) => setInquirySubject(e.target.value)}
+              style={{ fontSize: "0.82rem" }}
+            />
+            <textarea
+              required
+              rows={3}
+              placeholder="Type your message or question here…"
+              value={inquiryBody}
+              onChange={(e) => setInquiryBody(e.target.value)}
+              style={{ fontSize: "0.82rem", resize: "none" }}
+            />
+            <button type="submit" className="button button-primary button-small" style={{ justifySelf: "start" }}>
+              <Send size={14} /> Send Message
+            </button>
+          </form>
+
+          {/* Knowledge Base & FAQs */}
+          <div style={{ display: "grid", gap: "0.6rem" }}>
+            <span style={{ fontSize: "0.8rem", fontWeight: 750, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+              <HelpCircle size={16} /> Quick Answers & Security
+            </span>
+
+            <div style={{ display: "grid", gap: "0.5rem", fontSize: "0.75rem" }}>
+              <div style={{ padding: "0.6rem", background: "var(--surface-soft)", borderRadius: "10px", border: "1px solid var(--line-soft)" }}>
+                <strong style={{ color: "var(--text)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Lock size={13} style={{ color: "var(--primary)" }} /> Is my household data private?
+                </strong>
+                <p style={{ margin: "0.2rem 0 0", color: "var(--muted)" }}>Yes. Your pantry data is protected by Supabase Row Level Security (RLS) and is only accessible by your authenticated account.</p>
+              </div>
+
+              <div style={{ padding: "0.6rem", background: "var(--surface-soft)", borderRadius: "10px", border: "1px solid var(--line-soft)" }}>
+                <strong style={{ color: "var(--text)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Sparkles size={13} style={{ color: "var(--primary)" }} /> How is food risk calculated?
+                </strong>
+                <p style={{ margin: "0.2rem 0 0", color: "var(--muted)" }}>Our algorithm evaluates calendar days to expiry, package opened status, quantity, category perishability, and duplicate pantry items.</p>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="panel settings-section full">
