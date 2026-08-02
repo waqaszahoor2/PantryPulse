@@ -186,9 +186,11 @@ export default function SettingsPage() {
               <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="PK, IN, US, UK, etc." />
             </label>
           </div>
-          <button className="button button-primary" onClick={saveProfile} disabled={saving}>
-            {saving ? "Saving…" : "Save profile"}
-          </button>
+          <div className="form-actions" style={{ marginTop: "1.25rem", justifyContent: "flex-start" }}>
+            <button className="button button-primary" onClick={saveProfile} disabled={saving}>
+              {saving ? "Saving…" : "Save profile"}
+            </button>
+          </div>
         </section>
 
         <section className="panel settings-section">
