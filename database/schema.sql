@@ -21,10 +21,9 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null default '',
   household_size integer not null default 1 check (household_size between 1 and 30),
-  currency text not null default 'PKR' check (char_length(currency) between 3 and 5),
-  country text not null default 'PK' check (char_length(country) between 2 and 56),
-  gender text not null default 'Prefer not to say',
-  avatar_url text,
+  currency text not null default 'USD' check (char_length(currency) between 3 and 5),
+  country text not null default 'US' check (char_length(country) between 2 and 56),
+
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -117,23 +116,19 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, full_name, household_size, currency, country, gender, avatar_url)
+  insert into public.profiles (id, full_name, household_size, currency, country)
   values (
     new.id,
     coalesce(new.raw_user_meta_data ->> 'full_name', ''),
     greatest(1, least(30, coalesce((new.raw_user_meta_data ->> 'household_size')::integer, 1))),
-    coalesce(new.raw_user_meta_data ->> 'currency', 'PKR'),
-    coalesce(new.raw_user_meta_data ->> 'country', 'PK'),
-    coalesce(new.raw_user_meta_data ->> 'gender', 'Prefer not to say'),
-    coalesce(new.raw_user_meta_data ->> 'avatar_url', null)
+    coalesce(new.raw_user_meta_data ->> 'currency', 'USD'),
+    coalesce(new.raw_user_meta_data ->> 'country', 'US')
   )
   on conflict (id) do update set
     full_name = excluded.full_name,
     household_size = excluded.household_size,
     currency = excluded.currency,
-    country = excluded.country,
-    gender = excluded.gender,
-    avatar_url = excluded.avatar_url;
+    country = excluded.country;
   return new;
 end;
 $$;

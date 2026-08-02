@@ -631,10 +631,10 @@ button:hover:not(:disabled),
 }
 @media(max-width:900px){
   .app-frame{display:block}
-  .sidebar{transform:translateX(-105%);transition:transform .22s ease;box-shadow:16px 0 50px rgba(0,0,0,.25)}
+  .sidebar{position:fixed;top:0;bottom:0;left:0;width:280px;z-index:1000;transform:translateX(-105%);transition:transform .22s ease;box-shadow:16px 0 50px rgba(0,0,0,.25)}
   .sidebar-open{transform:translateX(0)}
   .sidebar-close{display:inline-flex;background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.15)}
-  .scrim{display:block;position:fixed;inset:0;border:0;background:rgba(5,15,10,.5);z-index:45;backdrop-filter:blur(2px)}
+  .scrim{display:block;position:fixed;inset:0;border:0;background:rgba(5,15,10,.5);z-index:999;backdrop-filter:blur(2px)}
   .app-main{min-height:100vh}
   .topbar{height:64px;padding:0 1rem}
   .topbar-title{display:flex;align-items:center;gap:.55rem}
@@ -647,12 +647,12 @@ button:hover:not(:disabled),
     position:fixed;left:0;right:0;bottom:0;height:68px;
     background:var(--topbar-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     border-top:1px solid var(--line);
-    display:grid;grid-template-columns:repeat(5,1fr);z-index:40;
+    display:grid;grid-template-columns:repeat(5,1fr);z-index:100;
     padding:5px max(8px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
   }
-  .mobile-nav a,.mobile-nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:.58rem}
-  .mobile-nav .active{color:var(--primary)}
-  .mobile-nav .mobile-add{width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;justify-self:center;align-self:-10px;box-shadow:0 7px 20px var(--primary-glow)}
+  .mobile-nav a,.mobile-nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:.58rem;min-height:44px;cursor:pointer}
+  .mobile-nav .active{color:var(--primary);font-weight:750}
+  .mobile-nav .mobile-add{width:46px;height:46px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;justify-self:center;align-self:center;margin-top:-14px;box-shadow:0 6px 18px var(--primary-glow);text-decoration:none}
   .dashboard-grid.top,.dashboard-grid.bottom,.recommendation-layout,.add-layout{grid-template-columns:1fr}
   .preview-column{position:static}
   .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}

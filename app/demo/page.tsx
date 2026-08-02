@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChartNoAxesColumnIncreasing, CirclePlus, Gauge, Info, Lightbulb, PackageSearch, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, ChartNoAxesColumnIncreasing, CirclePlus, Gauge, Info, Lightbulb, PackageSearch, RotateCcw, Sparkles, UserPlus } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { samplePantryItems } from "@/lib/data/mock";
@@ -36,42 +36,58 @@ function DemoContent() {
   return (
     <div className="app-frame" style={{ gridTemplateColumns: "1fr" }}>
       {/* Demo Banner */}
-      <div style={{ background: "#eef7f2", borderBottom: "1px solid #cce8d8", color: "#0f7d53", padding: "0.6rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.88rem", fontWeight: 500 }}>
-          <Info size={18} />
-          <span><strong>Sample demonstration data</strong> — Demo changes remain in the current browser and are not added to a registered user's Supabase account.</span>
+      <div style={{ background: "#eef7f2", borderBottom: "1px solid #cce8d8", color: "#0f7d53", padding: "0.6rem 1rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.82rem", fontWeight: 500 }}>
+          <Info size={18} style={{ flexShrink: 0 }} />
+          <span><strong>Sample demonstration data</strong> — Demo changes remain in local browser storage only.</span>
         </div>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
           <button type="button" onClick={resetDemo} className="button button-ghost button-small" style={{ gap: "0.3rem" }}>
             <RotateCcw size={14} /> Reset Demo
           </button>
           <Link href="/signup" className="button button-primary button-small" style={{ gap: "0.35rem" }}>
-            Create your free account <Sparkles size={14} />
+            Create free account <Sparkles size={14} />
           </Link>
         </div>
       </div>
 
       {/* Navigation Header */}
-      <header className="topbar" style={{ padding: "0.75rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+      <header className="topbar" style={{ padding: "0.75rem 1rem", borderBottom: "1px solid var(--border-color)", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", overflow: "hidden" }}>
           <Logo />
-          <nav style={{ display: "flex", gap: "0.5rem" }}>
-            <button className={`button ${activeTab === "dashboard" ? "button-primary" : "button-ghost"} button-small`} onClick={() => setActiveTab("dashboard")}>
+          <nav className="demo-nav-tabs" style={{ display: "flex", gap: "0.4rem", overflowX: "auto", paddingBottom: "2px" }} aria-label="Demo navigation">
+            <button
+              className={`button ${activeTab === "dashboard" ? "button-primary" : "button-ghost"} button-small`}
+              onClick={() => setActiveTab("dashboard")}
+              style={{ minHeight: "38px", whiteSpace: "nowrap" }}
+            >
               <Gauge size={16} /> Dashboard
             </button>
-            <button className={`button ${activeTab === "pantry" ? "button-primary" : "button-ghost"} button-small`} onClick={() => setActiveTab("pantry")}>
+            <button
+              className={`button ${activeTab === "pantry" ? "button-primary" : "button-ghost"} button-small`}
+              onClick={() => setActiveTab("pantry")}
+              style={{ minHeight: "38px", whiteSpace: "nowrap" }}
+            >
               <PackageSearch size={16} /> Pantry ({available.length})
             </button>
-            <button className={`button ${activeTab === "recommendations" ? "button-primary" : "button-ghost"} button-small`} onClick={() => setActiveTab("recommendations")}>
+            <button
+              className={`button ${activeTab === "recommendations" ? "button-primary" : "button-ghost"} button-small`}
+              onClick={() => setActiveTab("recommendations")}
+              style={{ minHeight: "38px", whiteSpace: "nowrap" }}
+            >
               <Lightbulb size={16} /> Recommendations
             </button>
-            <button className={`button ${activeTab === "insights" ? "button-primary" : "button-ghost"} button-small`} onClick={() => setActiveTab("insights")}>
+            <button
+              className={`button ${activeTab === "insights" ? "button-primary" : "button-ghost"} button-small`}
+              onClick={() => setActiveTab("insights")}
+              style={{ minHeight: "38px", whiteSpace: "nowrap" }}
+            >
               <ChartNoAxesColumnIncreasing size={16} /> Insights
             </button>
           </nav>
         </div>
 
-        <div className="topbar-actions">
+        <div className="topbar-actions" style={{ flexShrink: 0 }}>
           <Link href="/signup" className="button button-primary button-small">
             Sign Up Free
           </Link>
@@ -79,14 +95,14 @@ function DemoContent() {
       </header>
 
       {/* Main Content Area */}
-      <main className="content-area" style={{ padding: "1.5rem 2rem", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+      <main className="content-area" style={{ padding: "1.25rem 1rem 6rem", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
         {activeTab === "dashboard" && (
           <div className="page-stack">
             <section className="page-heading-row">
               <div>
                 <p className="eyebrow">Sample Overview</p>
                 <h1>Good morning, Demo Household <span aria-hidden="true">👋</span></h1>
-                <p>Review what needs attention in your demonstration pantry today. Sample figures use PKR formatting.</p>
+                <p>Review what needs attention in your demonstration pantry today.</p>
               </div>
               <Link href="/signup" className="button button-primary">
                 <CirclePlus size={18} /> Start Your Pantry
@@ -247,7 +263,30 @@ function DemoContent() {
         )}
       </main>
 
-      <footer className="landing-footer" style={{ marginTop: "3rem" }}>
+      {/* Mobile Navigation for Demo */}
+      <nav className="mobile-nav" aria-label="Demo mobile navigation">
+        <button className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>
+          <Gauge size={20} />
+          <span>Dashboard</span>
+        </button>
+        <button className={activeTab === "pantry" ? "active" : ""} onClick={() => setActiveTab("pantry")}>
+          <PackageSearch size={20} />
+          <span>Pantry</span>
+        </button>
+        <Link href="/signup" className="mobile-add" aria-label="Sign up for full access">
+          <Sparkles size={24} />
+        </Link>
+        <button className={activeTab === "recommendations" ? "active" : ""} onClick={() => setActiveTab("recommendations")}>
+          <Lightbulb size={20} />
+          <span>Tips</span>
+        </button>
+        <button className={activeTab === "insights" ? "active" : ""} onClick={() => setActiveTab("insights")}>
+          <ChartNoAxesColumnIncreasing size={20} />
+          <span>Insights</span>
+        </button>
+      </nav>
+
+      <footer className="landing-footer" style={{ marginTop: "3rem", paddingBottom: "5rem" }}>
         <Logo />
         <p>© 2026 PantryPulse. Track food. Save money. Waste less.</p>
         <Link href="/signup" className="button button-primary button-small" style={{ marginTop: "0.5rem" }}>
