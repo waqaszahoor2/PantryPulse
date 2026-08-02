@@ -1,24 +1,22 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
-import Link from "next/link";
+import { useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationPermission } from "@/components/notifications/notification-permission";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { AppMobileNav } from "@/components/navigation/AppMobileNav";
 import { UserMenu } from "@/components/navigation/UserMenu";
+import { LiveClock } from "@/components/navigation/LiveClock";
+import { NotificationButton } from "@/components/notifications/NotificationButton";
 import { AUTH_NAV_ITEMS } from "@/config/navigation";
-import { usePantry } from "@/lib/data/provider";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { notifications } = usePantry();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const unreadCount = useMemo(() => notifications.filter((item) => !item.read).length, [notifications]);
   const currentNavItem = AUTH_NAV_ITEMS.find((item) => pathname.startsWith(item.href));
 
   return (
@@ -58,19 +56,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <input aria-label="Search PantryPulse" placeholder="Search food, categories, pages…" />
           </label>
 
-          <div className="topbar-actions">
+          <div className="topbar-actions" style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <LiveClock />
             <NotificationPermission compact />
             <ThemeToggle />
-            <Link
-              className="icon-button notification-button"
-              href="/notifications"
-              aria-label={`${unreadCount} unread notifications`}
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && <span className="notification-dot">{unreadCount}</span>}
-            </Link>
-
-            {/* Dynamic Authenticated User Menu */}
+            <NotificationButton />
             <UserMenu />
           </div>
         </header>

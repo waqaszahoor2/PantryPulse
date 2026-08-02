@@ -34,20 +34,12 @@ function formatEventTime(isoString: string): string {
 
 import { AppPageContainer } from "@/components/layout/containers";
 
+import { DynamicGreeting } from "@/components/dashboard/DynamicGreeting";
+
 export default function DashboardPage() {
   const { items, events, loading, markStatus, profile } = usePantry();
   useExpiryNotifications(items);
 
-  const [greetingText, setGreetingText] = useState("Good day");
-  const [dateFormatted, setDateFormatted] = useState("");
-
-  useEffect(() => {
-    const now = new Date();
-    setGreetingText(getGreeting(now.getHours()));
-    setDateFormatted(now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }));
-  }, []);
-
-  const userName = profile?.fullName || "Household";
   const userCurrency = profile?.currency || "USD";
 
   const available = items.filter((item) => item.status === "available");
@@ -68,18 +60,12 @@ export default function DashboardPage() {
 
   return (
     <AppPageContainer className="page-stack">
-      <section className="page-heading-row">
-        <div>
-          <p className="eyebrow">{dateFormatted || "Today's overview"}</p>
-          <h1>
-            {greetingText}, {userName} <span aria-hidden="true">👋</span>
-          </h1>
-          <p>Here is what needs attention in your pantry today.</p>
-        </div>
-        <Link href="/add-item" className="button button-primary">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
+        <DynamicGreeting />
+        <Link href="/add-item" className="button button-primary" style={{ minHeight: "44px", marginTop: "0.5rem" }}>
           <CirclePlus size={18} /> Add grocery
         </Link>
-      </section>
+      </div>
 
       <section className="stats-grid">
         <article className="stat-card">
