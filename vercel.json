@@ -1,7 +1,5 @@
 {
-  "framework": "nextjs",
-  "rootDirectory": "pantrypulse-responsive",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install"
+  "buildCommand": "cd pantrypulse-responsive && npm install && npm run build",
+  "outputDirectory": "pantrypulse-responsive/.next",
+  "installCommand": "echo 'install handled in buildCommand'"
 }
