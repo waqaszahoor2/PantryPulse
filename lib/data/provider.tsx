@@ -379,36 +379,65 @@ export function PantryProvider({ children }: { children: ReactNode }) {
       if (patch.gender !== undefined) row.gender = patch.gender;
       if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
 
-      let data = null;
-      let error = null;
+      // Try UPDATE first if row exists
+      const { data: updateData, error: updateError } = await supabase
+        .from("profiles")
+        .update(row)
+        .eq("id", user.id)
+        .select()
+        .maybeSingle();
 
-      const res = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
-      data = res.data;
-      error = res.error;
+      let data = updateData;
 
-      // Graceful fallback if database schema cache lacks avatar_url or gender columns
-      if (error && (error.message?.includes("avatar_url") || error.message?.includes("gender") || error.message?.includes("schema cache") || error.code === "PGRST204")) {
-        delete row.avatar_url;
-        delete row.gender;
-        const retry = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
-        data = retry.data;
-        if (retry.error) throw new Error(retry.error.message || "Failed to update profile.");
-      } else if (error) {
-        throw new Error(error.message || "Failed to update profile.");
+      // If row does not exist yet, perform INSERT with full defaults
+      if (!data && (!updateError || updateError.code === "PGRST116")) {
+        const fullInsert = {
+          id: user.id,
+          full_name: patch.fullName?.trim() || user.email?.split("@")[0] || "User",
+          household_size: patch.householdSize || 1,
+          currency: patch.currency || "PKR",
+          country: patch.country || "PK",
+          gender: patch.gender || "Prefer not to say",
+          avatar_url: patch.avatarUrl || null,
+        };
+
+        const { data: insertData, error: insertError } = await supabase
+          .from("profiles")
+          .insert(fullInsert)
+          .select()
+          .single();
+
+        if (insertError) {
+          // If columns don't exist yet, retry without new columns
+          delete (fullInsert as Record<string, unknown>).avatar_url;
+          delete (fullInsert as Record<string, unknown>).gender;
+          const retry = await supabase.from("profiles").insert(fullInsert).select().single();
+          data = retry.data;
+        } else {
+          data = insertData;
+        }
+      } else if (updateError) {
+        // If update failed due to missing avatar_url/gender columns, retry update without them
+        if (updateError.message?.includes("avatar_url") || updateError.message?.includes("gender") || updateError.message?.includes("schema cache")) {
+          delete row.avatar_url;
+          delete row.gender;
+          const retry = await supabase.from("profiles").update(row).eq("id", user.id).select().single();
+          data = retry.data;
+        }
       }
 
-      setProfile({
-        id: String(data.id),
-        fullName: String(data.full_name || patch.fullName || user.email?.split("@")[0]),
-        householdSize: Number(data.household_size || 1),
-        currency: String(data.currency || "PKR"),
-        country: String(data.country || "PK"),
-        gender: String((data as Record<string, unknown>).gender || patch.gender || "Prefer not to say"),
-        avatarUrl: (data as Record<string, unknown>).avatar_url ? String((data as Record<string, unknown>).avatar_url) : patch.avatarUrl || "",
+      setProfile((cur) => ({
+        id: user.id,
+        fullName: patch.fullName !== undefined ? patch.fullName.trim() : cur?.fullName || user.email?.split("@")[0] || "User",
+        householdSize: patch.householdSize !== undefined ? patch.householdSize : cur?.householdSize || 1,
+        currency: patch.currency !== undefined ? patch.currency : cur?.currency || "PKR",
+        country: patch.country !== undefined ? patch.country : cur?.country || "PK",
+        gender: patch.gender !== undefined ? patch.gender : cur?.gender || "Prefer not to say",
+        avatarUrl: patch.avatarUrl !== undefined ? patch.avatarUrl : cur?.avatarUrl || "",
         email: user.email || "",
-        createdAt: String(data.created_at),
-        updatedAt: String(data.updated_at),
-      });
+        createdAt: data?.created_at ? String(data.created_at) : cur?.createdAt,
+        updatedAt: data?.updated_at ? String(data.updated_at) : new Date().toISOString(),
+      }));
       return;
     }
 
