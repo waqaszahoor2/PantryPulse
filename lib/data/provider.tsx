@@ -94,8 +94,11 @@ const defaultProfile: UserProfile = {
   id: "demo-user",
   fullName: "Demo User",
   householdSize: 2,
-  currency: "USD",
-  country: "US",
+  currency: "PKR",
+  country: "PK",
+  gender: "Prefer not to say",
+  email: "demo@pantrypulse.app",
+  avatarUrl: "",
 };
 
 export function PantryProvider({ children }: { children: ReactNode }) {
@@ -189,8 +192,11 @@ export function PantryProvider({ children }: { children: ReactNode }) {
             id: String(profData.id),
             fullName: String(profData.full_name || emailFallbackName),
             householdSize: Number(profData.household_size || 1),
-            currency: String(profData.currency || "USD"),
-            country: String(profData.country || "US"),
+            currency: String(profData.currency || "PKR"),
+            country: String(profData.country || "PK"),
+            gender: String(profData.gender || "Prefer not to say"),
+            avatarUrl: profData.avatar_url ? String(profData.avatar_url) : "",
+            email: user.email || "",
             createdAt: String(profData.created_at),
             updatedAt: String(profData.updated_at),
           });
@@ -199,8 +205,11 @@ export function PantryProvider({ children }: { children: ReactNode }) {
             id: user.id,
             fullName: (user.user_metadata?.full_name as string) || emailFallbackName,
             householdSize: Number(user.user_metadata?.household_size || 1),
-            currency: "USD",
-            country: "US",
+            currency: "PKR",
+            country: "PK",
+            gender: "Prefer not to say",
+            email: user.email || "",
+            avatarUrl: "",
           });
         }
 
@@ -367,6 +376,8 @@ export function PantryProvider({ children }: { children: ReactNode }) {
       if (patch.householdSize !== undefined) row.household_size = patch.householdSize;
       if (patch.currency !== undefined) row.currency = patch.currency;
       if (patch.country !== undefined) row.country = patch.country;
+      if (patch.gender !== undefined) row.gender = patch.gender;
+      if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
 
       const { data, error } = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
       if (error) throw new Error(error.message || "Failed to update profile.");
@@ -375,15 +386,18 @@ export function PantryProvider({ children }: { children: ReactNode }) {
         id: String(data.id),
         fullName: String(data.full_name || patch.fullName || user.email?.split("@")[0]),
         householdSize: Number(data.household_size || 1),
-        currency: String(data.currency || "USD"),
-        country: String(data.country || "US"),
+        currency: String(data.currency || "PKR"),
+        country: String(data.country || "PK"),
+        gender: String(data.gender || patch.gender || "Prefer not to say"),
+        avatarUrl: data.avatar_url ? String(data.avatar_url) : patch.avatarUrl || "",
+        email: user.email || "",
         createdAt: String(data.created_at),
         updatedAt: String(data.updated_at),
       });
       return;
     }
 
-    setProfile((cur) => cur ? { ...cur, ...patch } : { id: "demo-user", fullName: patch.fullName || "Demo User", householdSize: patch.householdSize || 2, currency: patch.currency || "USD", country: patch.country || "US" });
+    setProfile((cur) => cur ? { ...cur, ...patch } : { id: "demo-user", fullName: patch.fullName || "Demo User", householdSize: patch.householdSize || 2, currency: patch.currency || "PKR", country: patch.country || "PK", gender: patch.gender || "Prefer not to say", avatarUrl: patch.avatarUrl || "", email: "demo@pantrypulse.app" });
   }, [mode]);
 
   const exportDataAsJSON = useCallback(() => {

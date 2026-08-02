@@ -8,6 +8,9 @@ export interface UserProfile {
   householdSize: number;
   currency: string;
   country: string;
+  gender?: string;
+  avatarUrl?: string;
+  email?: string;
   createdAt?: string;
   updatedAt?: string;
 }
