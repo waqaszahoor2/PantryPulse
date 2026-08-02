@@ -314,8 +314,14 @@ export default function SettingsPage() {
             </a>
           </div>
 
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+            <Link href="/support" className="button button-primary button-small">
+              Open Contact Support Form
+            </Link>
+          </div>
+
           <p className="muted" style={{ margin: 0, fontSize: "0.78rem" }}>
-            Clicking the email link above will open <strong>Gmail</strong> directly to send your query to us.
+            Need help? Click above to open the support form or compose directly in Gmail.
           </p>
 
           {/* Knowledge Base & FAQs */}

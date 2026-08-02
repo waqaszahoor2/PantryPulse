@@ -95,6 +95,10 @@ export default function LoginPage() {
           <p className="auth-switch">
             New to PantryPulse? <Link href="/signup">Create an account</Link>
           </p>
+
+          <p className="auth-switch" style={{ marginTop: "-0.5rem", fontSize: "0.78rem" }}>
+            Need assistance? <Link href="/support">Contact Support</Link>
+          </p>
         </form>
       </main>
     </div>

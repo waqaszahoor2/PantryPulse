@@ -17,6 +17,7 @@ export default function LandingPage() {
         <nav>
           <a href="#features">Features</a>
           <a href="#how">How it works</a>
+          <Link href="/support">Support</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/food-safety">Food Safety</Link>
         </nav>
@@ -147,6 +148,7 @@ export default function LandingPage() {
         <Logo />
         <p>© 2026 PantryPulse. Track food. Save money. Waste less.</p>
         <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", fontSize: "0.85rem" }}>
+          <Link href="/support">Support</Link>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms of Service</Link>
           <Link href="/food-safety">Food Safety Disclaimer</Link>
