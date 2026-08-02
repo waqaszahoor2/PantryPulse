@@ -84,7 +84,15 @@ export default function PrivacyPage() {
               <h3>7. Contact Us</h3>
               <p>
                 For privacy inquiries or technical support, contact our support team at:{" "}
-                <a href={`mailto:${supportEmail}`} className="link-text" style={{ fontWeight: 600 }}>{supportEmail}</a>.
+                <a
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(supportEmail)}&su=${encodeURIComponent("PantryPulse Privacy Inquiry")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-text"
+                  style={{ fontWeight: 600 }}
+                >
+                  {supportEmail}
+                </a>.
               </p>
             </div>
           </section>

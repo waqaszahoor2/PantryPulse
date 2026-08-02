@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(supportEmail)}&su=${encodeURIComponent("PantryPulse Support Query")}`;
 
   useEffect(() => {
     if (profile) {
@@ -308,11 +309,13 @@ export default function SettingsPage() {
 
           <div className="support-email">
             <Mail size={18} />
-            <a href={`mailto:${supportEmail}`} className="link-text">{supportEmail}</a>
+            <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="link-text" title="Click to compose query in Gmail">
+              {supportEmail}
+            </a>
           </div>
 
           <p className="muted" style={{ margin: 0, fontSize: "0.78rem" }}>
-            Support queries are handled directly via email.
+            Clicking the email link above will open <strong>Gmail</strong> directly to send your query to us.
           </p>
 
           {/* Knowledge Base & FAQs */}
