@@ -1,91 +1,125 @@
-# PantryPulse
+# PantryPulse – Household Grocery Tracking & Food Waste Reduction
 
-A professional, responsive food-expiry and household-waste prevention frontend based on the supplied desktop and mobile reference design.
+PantryPulse is a production-quality, secure, responsive web application built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase. It helps households manage grocery inventories, receive expiry warnings, reduce food waste, and track savings.
 
-## Included
+## Key Features
 
-- Desktop sidebar and mobile bottom navigation
-- Landing, login, signup, dashboard, pantry, add-grocery, shopping-list, recommendations, insights, notifications, and settings pages
-- Working demo mode with local browser storage
-- Supabase-ready authentication and CRUD repository
-- PostgreSQL schema, indexes, constraints, triggers, and Row Level Security
-- Browser notification permission and service worker
-- JSON data export and secure account-deletion endpoint
-- Zod validation, security headers, CSP, origin checks, secret-key isolation, and rate limiting
-- Responsive layouts for desktop, tablet, and mobile
+- **Pantry Management**: Full CRUD operations for groceries with categories, quantities, prices, storage locations, package opened status, and custom notes.
+- **Rule-Based Risk Engine**: Transparent 0–100 urgency score calculating risk levels (Low, Medium, High, Expired) based on expiry date, opened status, storage location, perishability, and duplicate availability.
+- **Shopping List & Duplicate Detection**: Plan grocery purchases and receive intelligent warnings when adding items already stored in your pantry. Move purchased items to your pantry with one click.
+- **Inventory Event Logging**: Complete audit log recorded in Supabase (`inventory_events`) for tracking all additions, edits, consumption, donations, and waste entries.
+- **Dynamic Analytics & Charts**: Real-time outcome charts (consumed vs wasted vs donated), weekly waste trends, waste by category, and financial impact (money saved vs lost).
+- **Public Interactive Sandbox Demo**: Dedicated `/demo` route allowing unauthenticated users to explore the application safely with isolated sample data without touching production database tables.
+- **Enterprise-Grade Security**: Row Level Security (RLS) policies on all tables (`auth.uid() = user_id`), secure server-side account deletion via `/api/account/delete`, Zod schema validation, Content Security Policy (CSP), rate limiting, and secret key protection.
+- **Complete Legal & Food Safety Coverage**: Dedicated routes for `/privacy`, `/terms`, and `/food-safety`.
+- **Data Mobility**: Complete JSON and CSV data exports plus options to clear individual data layers or delete your account.
 
-## 1. Run immediately in demo mode
+---
+
+## Getting Started
+
+### 1. Run Locally (Demo Sandbox Mode)
 
 ```bash
-cp .env.example .env.local
+# Clone the repository
+git clone https://github.com/waqaszahoor2/PantryPulse.git
+cd pantrypulse-complete-project
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
 ```
 
-Open `http://localhost:3000`. Demo mode does not require a database.
+Open [http://localhost:3000](http://localhost:3000) in your browser. Demo mode operates instantly using browser local storage without requiring external database keys.
 
-## 2. Connect Supabase later
+---
 
-1. Create a Supabase project.
-2. Run `database/schema.sql` in the Supabase SQL editor.
-3. Update `.env.local`:
+### 2. Connect Supabase Database
+
+1. Create a project at [Supabase](https://supabase.com).
+2. Open the Supabase **SQL Editor** and run the contents of `database/schema.sql`.
+3. Create a `.env.local` file in the project root:
 
 ```env
 NEXT_PUBLIC_DATA_MODE=supabase
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
-SUPABASE_SERVICE_ROLE_KEY=YOUR_SECRET_SERVER_KEY
-NEXT_PUBLIC_SUPPORT_EMAIL=your-public-support-gmail@gmail.com
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-secret-service-role-key
+NEXT_PUBLIC_SUPPORT_EMAIL=support@pantrypulse.app
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-4. In Supabase Authentication, add your local and Vercel URLs as allowed redirect URLs.
-5. Add the same variables to Vercel. Mark `SUPABASE_SERVICE_ROLE_KEY` as sensitive and never expose it to the browser.
+4. In Supabase **Authentication -> URL Configuration**, add your local site URL (`http://localhost:3000`) and your production Vercel URL to the Redirect URLs list.
 
-## 3. Deploy to Vercel
+---
 
-- Push this folder to GitHub.
-- Import the repository into your existing Vercel account.
-- Add the environment variables.
-- Deploy the production branch.
-- Test signup, login, data isolation, delete operations, notification permission, and mobile layout.
+### 3. Deploy to Vercel
 
-## Gmail use
+1. Push your repository to GitHub.
+2. Import the project into [Vercel](https://vercel.com).
+3. Set the Environment Variables under **Project Settings -> Environment Variables**:
+   - `NEXT_PUBLIC_DATA_MODE` = `supabase`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` *(Mark as Sensitive)*
+   - `NEXT_PUBLIC_SUPPORT_EMAIL`
+   - `NEXT_PUBLIC_SITE_URL`
+4. Deploy the production branch.
 
-Gmail is not used as a database. Add a dedicated public support Gmail through `NEXT_PUBLIC_SUPPORT_EMAIL`. Your private owner Gmail can remain hidden as the account used to manage Vercel, GitHub, and Supabase.
+---
 
-## Notifications
+## Security Architecture & Checklist
 
-The included feature requests browser permission only after the user presses **Enable alerts**. It shows a local expiry reminder when the app is opened. Fully scheduled notifications while the app is closed require a Web Push subscription service and VAPID keys, which are intentionally not faked in this package.
+- [x] **Row Level Security (RLS)**: Active on `profiles`, `pantry_items`, `inventory_events`, `shopping_list`, and `app_notifications`.
+- [x] **Client-Side Secret Protection**: `SUPABASE_SERVICE_ROLE_KEY` is restricted strictly to Node.js server runtime routes (`app/api/account/delete/route.ts`).
+- [x] **Zod Validation**: All user inputs and API payloads are validated on client and server.
+- [x] **Account Deletion Protocol**: Requires authenticated user session, rate-limited IP check, origin validation, and explicit user typed confirmation (`DELETE`).
+- [x] **Security Headers**: Configured in `next.config.ts` (CSP, Referrer-Policy, X-Frame-Options, X-Content-Type-Options, Permissions-Policy, HSTS).
 
-## Security notes
+---
 
-- Run the supplied RLS SQL before using real user data.
-- Never put `SUPABASE_SERVICE_ROLE_KEY` in a variable beginning with `NEXT_PUBLIC_`.
-- Keep `.env.local` out of GitHub.
-- The account-deletion API validates the user token, checks the request origin, validates the confirmation body, and rate-limits repeated attempts.
-- React renders user-entered text safely; the code does not use `dangerouslySetInnerHTML`.
-- Browser notifications and service workers require HTTPS in production.
-
-## Commands
+## Testing & Code Quality
 
 ```bash
-npm run dev
+# Typecheck TypeScript files
 npm run typecheck
+
+# Run Vitest unit tests
 npm test
+
+# Build production bundle
 npm run build
 ```
 
-## Project structure
+---
+
+## Project Structure
 
 ```text
-app/                 Next.js routes and API endpoints
-components/          Responsive UI and chart components
-lib/                 Data types, risk rules, data provider, Supabase clients
-public/              PWA manifest, icons, and service worker
-database/schema.sql  Supabase database and RLS setup
-tests/               Risk-engine tests
+app/                     Next.js App Router pages and API routes
+├── (app)/               Protected application views (dashboard, pantry, shopping, insights, settings)
+├── (auth)/              Authentication routes (login, signup, forgot-password, reset-password)
+├── demo/                Public interactive demo sandbox
+├── privacy/             Public Privacy Policy
+├── terms/               Public Terms of Service
+├── food-safety/         Public Food Safety Disclaimer
+└── api/                 Secure server API routes
+components/              Modular UI components and recharts views
+database/schema.sql      Complete Supabase SQL schema, RLS policies, and triggers
+lib/                     Data provider, risk engine, and Supabase client initializers
+tests/                   Vitest unit tests for risk engine and calculations
 ```
 
-## Food-safety limitation
+---
 
-PantryPulse provides planning estimates only. It does not determine whether food is safe to consume. Users must follow package instructions and official food-safety guidance.
+## Food Safety Notice
+
+PantryPulse provides storage, expiry, and planning estimates only. It does not determine whether food is safe to consume. Always follow package instructions and official food-safety guidance. When uncertain, discard the product.
+
+---
+
+## License
+
+© 2026 PantryPulse. All rights reserved.

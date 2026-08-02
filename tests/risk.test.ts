@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateRisk, daysUntil } from "@/lib/risk";
+import { calculateRisk, daysUntil, formatCurrency } from "@/lib/risk";
 import type { PantryItem } from "@/lib/types";
 
 const base: PantryItem = {
@@ -16,5 +16,10 @@ describe("risk engine", () => {
     const result = calculateRisk({ ...base, opened: true }, 1);
     expect(result.level).toBe("high");
     expect(result.score).toBeGreaterThanOrEqual(70);
+  });
+  it("formats currency correctly for PKR, INR, and USD", () => {
+    expect(formatCurrency(1840, "PKR")).toBe("PKR 1,840");
+    expect(formatCurrency(2500, "INR")).toBe("₹2,500");
+    expect(formatCurrency(100, "USD")).toContain("100");
   });
 });

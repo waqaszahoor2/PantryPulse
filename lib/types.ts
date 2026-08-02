@@ -2,6 +2,16 @@ export type PantryStatus = "available" | "consumed" | "wasted" | "donated" | "ex
 export type RiskLevel = "low" | "medium" | "high" | "expired";
 export type StorageLocation = "Pantry" | "Refrigerator" | "Freezer" | "Kitchen counter" | "Other";
 
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  householdSize: number;
+  currency: string;
+  country: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PantryItem {
   id: string;
   userId?: string;
@@ -40,6 +50,29 @@ export interface AppNotification {
   type: "urgent" | "warning" | "info" | "success";
   itemId?: string;
   read: boolean;
+  createdAt: string;
+}
+
+export type InventoryEventType =
+  | "item_added"
+  | "item_updated"
+  | "quantity_updated"
+  | "storage_changed"
+  | "item_opened"
+  | "marked_consumed"
+  | "marked_wasted"
+  | "marked_donated"
+  | "item_deleted"
+  | "expiry_updated"
+  | "shopping_item_added"
+  | "shopping_item_completed";
+
+export interface InventoryEvent {
+  id: string;
+  userId?: string;
+  itemId?: string;
+  eventType: InventoryEventType | string;
+  details: Record<string, unknown>;
   createdAt: string;
 }
 

@@ -7,6 +7,7 @@ export function startOfLocalDay(value: Date): Date {
 }
 
 export function daysUntil(dateString: string, now = new Date()): number {
+  if (!dateString) return 0;
   const target = startOfLocalDay(new Date(`${dateString}T00:00:00`));
   const today = startOfLocalDay(now);
   return Math.ceil((target.getTime() - today.getTime()) / DAY_MS);
@@ -22,54 +23,54 @@ export function calculateRisk(item: PantryItem, similarAvailableCount = 0): Risk
       level: "expired",
       daysRemaining,
       reasons: ["The recorded expiry date has passed."],
-      action: "Review the label and discard when uncertain.",
+      action: "Review package label and discard if quality or safety is uncertain.",
     };
   }
 
   let score = 0;
   if (daysRemaining === 0) {
-    score += 55;
+    score += 60;
     reasons.push("The item expires today.");
   } else if (daysRemaining === 1) {
-    score += 45;
+    score += 48;
     reasons.push("The item expires tomorrow.");
   } else if (daysRemaining <= 3) {
-    score += 35;
-    reasons.push(`Only ${daysRemaining} days remain.`);
+    score += 36;
+    reasons.push(`Only ${daysRemaining} days remain until expiry.`);
   } else if (daysRemaining <= 7) {
-    score += 18;
+    score += 20;
     reasons.push("The item expires within one week.");
   }
 
   if (item.opened) {
     score += 15;
-    reasons.push("The package is already open.");
+    reasons.push("The package is open.");
   }
 
   if (item.quantity >= 3) {
     score += 12;
-    reasons.push("The recorded quantity is relatively high.");
+    reasons.push("The recorded quantity is high.");
   }
 
   if (similarAvailableCount > 0) {
     score += Math.min(18, similarAvailableCount * 8);
-    reasons.push(`${similarAvailableCount} similar item${similarAvailableCount > 1 ? "s are" : " is"} already available.`);
+    reasons.push(`${similarAvailableCount} similar item${similarAvailableCount > 1 ? "s are" : " is"} already in your pantry.`);
   }
 
   if (["Dairy", "Vegetables", "Fruits", "Meat", "Bread & Bakery"].includes(item.category)) {
     score += 8;
-    reasons.push("This is a relatively perishable category.");
+    reasons.push("Perishable category.");
   }
 
   score = Math.min(100, Math.max(0, score));
   const level = score >= 70 ? "high" : score >= 40 ? "medium" : "low";
   const action = level === "high"
-    ? "Plan to use, freeze, or donate this item soon."
+    ? "Plan to consume, freeze, or donate this item soon."
     : level === "medium"
-      ? "Keep this item visible and include it in an upcoming meal."
-      : "No immediate action is needed.";
+      ? "Keep this item visible and plan to use it this week."
+      : "No immediate action required.";
 
-  if (reasons.length === 0) reasons.push("The item has sufficient time remaining and no major risk signals.");
+  if (reasons.length === 0) reasons.push("Sufficient shelf life remaining.");
   return { score, level, daysRemaining, reasons, action };
 }
 
@@ -78,4 +79,18 @@ export function expiryLabel(daysRemaining: number): string {
   if (daysRemaining === 0) return "Expires today";
   if (daysRemaining === 1) return "Expires tomorrow";
   return `Expires in ${daysRemaining} days`;
+}
+
+export function formatCurrency(amount: number, currency = "PKR"): string {
+  try {
+    if (currency === "PKR") {
+      return `PKR ${amount.toLocaleString("en-PK", { maximumFractionDigits: 2 })}`;
+    }
+    if (currency === "INR") {
+      return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+    }
+    return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  } catch {
+    return `${currency} ${amount.toLocaleString()}`;
+  }
 }

@@ -1,9 +1,29 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const title = "PantryPulse – Track Food, Save Money, Waste Less";
+const description = "Track groceries, receive expiry reminders, reduce household food waste, and understand your food-saving habits with PantryPulse.";
+
 export const metadata: Metadata = {
-  title: { default: "PantryPulse", template: "%s · PantryPulse" },
-  description: "Track groceries, reduce food waste, and save money.",
+  title: {
+    default: title,
+    template: "%s · PantryPulse",
+  },
+  description,
+  keywords: ["pantry tracker", "grocery manager", "food waste reduction", "expiry alerts", "household food tracking"],
+  authors: [{ name: "PantryPulse Team" }],
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    siteName: "PantryPulse",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
 };
