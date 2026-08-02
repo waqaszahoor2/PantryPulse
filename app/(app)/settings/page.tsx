@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const {
     profile,
     updateUserProfile,
+    sendSupportInquiry,
     exportDataAsJSON,
     exportDataAsCSV,
     clearPantryData,
@@ -42,6 +43,7 @@ export default function SettingsPage() {
   const [inquirySubject, setInquirySubject] = useState("");
   const [inquiryBody, setInquiryBody] = useState("");
   const [inquirySent, setInquirySent] = useState(false);
+  const [sendingInquiry, setSendingInquiry] = useState(false);
 
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
 
@@ -104,13 +106,29 @@ export default function SettingsPage() {
     }
   }
 
-  function handleSendInquiry(e: React.FormEvent) {
+  async function handleSendInquiry(e: React.FormEvent) {
     e.preventDefault();
-    if (!inquiryBody.trim()) return;
-    setInquirySent(true);
-    setInquirySubject("");
-    setInquiryBody("");
-    setTimeout(() => setInquirySent(false), 5000);
+    if (!inquiryBody.trim() || sendingInquiry) return;
+    setSendingInquiry(true);
+    try {
+      const subjectText = inquirySubject.trim() || "PantryPulse Support Inquiry";
+      const bodyText = inquiryBody.trim();
+
+      // 1. Dispatch in-app confirmation notification & record support event
+      await sendSupportInquiry(subjectText, bodyText);
+      setInquirySent(true);
+
+      // 2. Open email client with prefilled subject & body to reach Gmail directly
+      const mailtoUrl = `mailto:${supportEmail}?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
+      window.open(mailtoUrl, "_blank");
+
+      setInquirySubject("");
+      setInquiryBody("");
+    } catch {
+      alert("Unable to process support inquiry.");
+    } finally {
+      setSendingInquiry(false);
+    }
   }
 
   function handleDownloadJSON() {
@@ -333,7 +351,7 @@ export default function SettingsPage() {
 
             {inquirySent && (
               <p className="form-message success" style={{ fontSize: "0.75rem", margin: 0 }}>
-                Message sent successfully! Our support team will get back to you via email.
+                Query sent! A default confirmation notification has been posted to your account notifications feed.
               </p>
             )}
 
@@ -351,8 +369,8 @@ export default function SettingsPage() {
               onChange={(e) => setInquiryBody(e.target.value)}
               style={{ fontSize: "0.82rem", resize: "none" }}
             />
-            <button type="submit" className="button button-primary button-small" style={{ justifySelf: "start" }}>
-              <Send size={14} /> Send Message
+            <button type="submit" className="button button-primary button-small" disabled={sendingInquiry} style={{ justifySelf: "start" }}>
+              <Send size={14} /> {sendingInquiry ? "Sending…" : "Send Message"}
             </button>
           </form>
 

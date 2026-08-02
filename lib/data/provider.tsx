@@ -24,6 +24,7 @@ interface PantryContextValue {
   markAllNotificationsRead(): Promise<void>;
   deleteNotification(id: string): Promise<void>;
   updateUserProfile(data: Partial<UserProfile>): Promise<void>;
+  sendSupportInquiry(subject: string, message: string): Promise<void>;
   exportDataAsJSON(): string;
   exportDataAsCSV(): string;
   clearPantryData(): Promise<void>;
@@ -444,6 +445,55 @@ export function PantryProvider({ children }: { children: ReactNode }) {
     setProfile((cur) => cur ? { ...cur, ...patch } : { id: "demo-user", fullName: patch.fullName || "Demo User", householdSize: patch.householdSize || 2, currency: patch.currency || "PKR", country: patch.country || "PK", gender: patch.gender || "Prefer not to say", avatarUrl: patch.avatarUrl || "", email: "demo@pantrypulse.app" });
   }, [mode]);
 
+  const sendSupportInquiry = useCallback(async (subject: string, message: string) => {
+    const stamp = new Date().toISOString();
+    const cleanSubject = subject.trim() || "General Inquiry";
+    const cleanMessage = message.trim();
+
+    const noteTitle = "Support Query Received";
+    const noteMsg = `We have received your support query regarding "${cleanSubject}". Our team is currently reviewing your message and will respond to your email shortly.`;
+
+    if (mode === "supabase") {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: noteData } = await supabase.from("app_notifications").insert({
+          user_id: user.id,
+          title: noteTitle,
+          message: noteMsg,
+          type: "info",
+          is_read: false,
+        }).select().single();
+
+        if (noteData) {
+          const newNote: AppNotification = {
+            id: String(noteData.id),
+            userId: String(noteData.user_id),
+            title: String(noteData.title),
+            message: String(noteData.message),
+            type: "info",
+            read: false,
+            createdAt: String(noteData.created_at),
+          };
+          setNotifications((cur) => [newNote, ...cur]);
+        }
+      }
+    } else {
+      const newNote: AppNotification = {
+        id: crypto.randomUUID(),
+        userId: "demo-user",
+        title: noteTitle,
+        message: noteMsg,
+        type: "info",
+        read: false,
+        createdAt: stamp,
+      };
+      setNotifications((cur) => [newNote, ...cur]);
+    }
+
+    await recordEvent("support_inquiry_sent", { subject: cleanSubject, message: cleanMessage });
+  }, [mode, recordEvent]);
+
   const exportDataAsJSON = useCallback(() => {
     const payload = {
       profile,
@@ -521,7 +571,7 @@ export function PantryProvider({ children }: { children: ReactNode }) {
     addItem, updateItem, deleteItem, markStatus,
     addShoppingItem, toggleShoppingItem, deleteShoppingItem,
     markNotificationRead, markAllNotificationsRead, deleteNotification,
-    updateUserProfile, exportDataAsJSON, exportDataAsCSV,
+    updateUserProfile, sendSupportInquiry, exportDataAsJSON, exportDataAsCSV,
     clearPantryData, clearEventHistory, clearShoppingData,
     resetDemoData, clearLocalData,
   }), [
@@ -529,7 +579,7 @@ export function PantryProvider({ children }: { children: ReactNode }) {
     addItem, updateItem, deleteItem, markStatus,
     addShoppingItem, toggleShoppingItem, deleteShoppingItem,
     markNotificationRead, markAllNotificationsRead, deleteNotification,
-    updateUserProfile, exportDataAsJSON, exportDataAsCSV,
+    updateUserProfile, sendSupportInquiry, exportDataAsJSON, exportDataAsCSV,
     clearPantryData, clearEventHistory, clearShoppingData,
     resetDemoData, clearLocalData,
   ]);
