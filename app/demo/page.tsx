@@ -13,6 +13,7 @@ import { OutcomeChart, WeeklyWasteChart, CategoryWasteChart } from "@/components
 import { PantryProvider } from "@/lib/data/provider";
 import { DemoSidebar } from "@/components/navigation/DemoSidebar";
 import { DemoMobileNav } from "@/components/navigation/DemoMobileNav";
+import { HeaderBackButton } from "@/components/ui/header-back-button";
 
 function DemoContent() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "pantry" | "recommendations" | "insights">("dashboard");
@@ -71,7 +72,8 @@ function DemoContent() {
             <strong>Demo {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</strong>
           </div>
 
-          <div className="topbar-actions">
+          <div className="topbar-actions" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <HeaderBackButton />
             <Link href="/signup" className="button button-primary button-small">
               Sign Up Free
             </Link>

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, ShieldAlert } from "lucide-react";
+import { ExternalLink, ShieldAlert } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { HeaderBackButton } from "@/components/ui/header-back-button";
 
 export const metadata = {
   title: "Food Safety Disclaimer",
@@ -10,11 +11,9 @@ export const metadata = {
 export default function FoodSafetyPage() {
   return (
     <div className="landing-shell">
-      <header className="landing-header">
+      <header className="landing-header" style={{ padding: "0.75rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Link href="/" className="button button-ghost button-small">
-          <ArrowLeft size={16} /> Back to home
-        </Link>
+        <HeaderBackButton />
       </header>
 
       <main style={{ maxWidth: "800px", margin: "2rem auto", padding: "0 1.5rem" }}>
@@ -45,32 +44,24 @@ export default function FoodSafetyPage() {
                   Discard food showing mold, unusual odor, damaged packaging, unexpected color, or abnormal texture. However, food can still be unsafe even when it looks and smells normal. Never rely only on sensory inspection. Follow package instructions, storage duration, time and temperature guidance, and advice from official food-safety authorities.
                 </p>
               </div>
-
-              <ul style={{ paddingLeft: "1.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                <li><strong>Refrigeration Temperature:</strong> Ensure your refrigerator maintains a temperature of 40°F (4°C) or below, and freezer at 0°F (-18°C) or below.</li>
-                <li><strong>Opened Packages:</strong> Once a package is opened, shelf life is typically reduced compared to unopened sealed packages.</li>
-                <li><strong>Perishable Items:</strong> Raw meats, seafood, unpasteurized dairy, and cooked leftovers require prompt handling and careful monitoring.</li>
-              </ul>
             </div>
 
             <div>
-              <h3>Official Food Safety Resources</h3>
-              <p>
-                For official food storage guidelines and regulatory safety advice, consult local public health agencies:
-              </p>
-              <ul style={{ paddingLeft: "1.5rem", marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <h3>Official Food Safety Authorities</h3>
+              <p>For verified guidelines on storage temperature, food handling, and shelf-life recommendations, consult official public resources:</p>
+              <ul style={{ paddingLeft: "1.25rem", display: "grid", gap: "0.5rem", marginTop: "0.5rem" }}>
                 <li>
-                  <a href="https://www.foodsafety.gov" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-                    FoodSafety.gov (US Department of Health & Human Services) <ExternalLink size={14} />
+                  <a href="https://www.foodsafety.gov" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                    FoodSafety.gov (U.S. Official Resource) <ExternalLink size={14} />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.fda.gov/food" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <a href="https://www.fda.gov/food" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
                     U.S. Food and Drug Administration (FDA) <ExternalLink size={14} />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.who.int/health-topics/food-safety" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <a href="https://www.who.int/news-room/fact-sheets/detail/food-safety" target="_blank" rel="noopener noreferrer" className="link-text" style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
                     World Health Organization (WHO) Food Safety <ExternalLink size={14} />
                   </a>
                 </li>
@@ -83,6 +74,9 @@ export default function FoodSafetyPage() {
       <footer className="landing-footer">
         <Logo />
         <p>© 2026 PantryPulse. Track food. Save money. Waste less.</p>
+        <Link href="/support" className="link-text" style={{ fontSize: "0.78rem" }}>
+          Contact Support
+        </Link>
       </footer>
     </div>
   );

@@ -730,6 +730,7 @@ button:hover:not(:disabled),
   .content-area{padding:.85rem .75rem 5.6rem}
   .panel{padding:.9rem}
   .shopping-row{padding:.75rem}
+  .header-back-button{display:inline-flex!important}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}

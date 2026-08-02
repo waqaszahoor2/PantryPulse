@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, FileText } from "lucide-react";
+import { ExternalLink, FileText } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { HeaderBackButton } from "@/components/ui/header-back-button";
 import { buildGmailComposeUrl, getFixedSupportEmail } from "@/lib/support/build-email-links";
 
 export const metadata = {
@@ -21,81 +22,61 @@ export default function TermsPage() {
 
   return (
     <div className="landing-shell">
-      <header className="landing-header">
+      <header className="landing-header" style={{ padding: "0.75rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Link href="/" className="button button-ghost button-small">
-          <ArrowLeft size={16} /> Back to home
-        </Link>
+        <HeaderBackButton />
       </header>
 
       <main style={{ maxWidth: "800px", margin: "2rem auto", padding: "0 1.5rem" }}>
         <article className="panel" style={{ padding: "2.5rem" }}>
           <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <FileText size={16} /> Agreement
+            <FileText size={18} /> User Agreement
           </div>
           <h1 style={{ fontSize: "2.2rem", margin: "0.5rem 0 1.5rem" }}>Terms of Service</h1>
-          <p className="muted" style={{ marginBottom: "2rem" }}>Last updated: August 2026</p>
 
-          <section style={{ display: "flex", flexDirection: "column", gap: "1.5rem", lineHeight: "1.6" }}>
+          <p className="muted" style={{ fontSize: "0.9rem", marginBottom: "2rem" }}>
+            Last updated: August 2026. By accessing or using PantryPulse, you agree to these Terms of Service.
+          </p>
+
+          <section style={{ display: "flex", flexDirection: "column", gap: "1.75rem", lineHeight: "1.6" }}>
             <div>
-              <h3>1. Acceptable Use</h3>
+              <h3>1. Description of Service</h3>
               <p>
-                PantryPulse is designed for personal household food management, grocery tracking, and waste reduction analytics. You agree to use the service lawfully and in accordance with these Terms.
+                PantryPulse is a household inventory tracking application designed to organize groceries, estimate storage duration, highlight expiry priorities, and reduce food waste.
               </p>
             </div>
 
             <div>
-              <h3>2. Account Security & Responsibilities</h3>
+              <h3>2. Food Safety & Planning Disclaimer</h3>
               <p>
-                You are responsible for maintaining the confidentiality of your login credentials and for all activities conducted under your household account. Notify us immediately at{" "}
-                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="link-text" style={{ fontWeight: 600 }}>
-                  {supportEmail}
-                </a>{" "}
-                if you suspect unauthorized access.
+                PantryPulse provides storage, expiry, and planning estimates only. It does not determine whether food is safe to consume. When uncertain, discard the product and follow official food-safety guidance. User relies on estimates at their own discretion.
               </p>
             </div>
 
             <div>
-              <h3>3. Service Availability</h3>
+              <h3>3. User Accounts & Security</h3>
               <p>
-                We strive for continuous service availability; however, maintenance, server updates, or cloud provider disruptions may occasionally cause service interruptions. PantryPulse is provided on an "as is" and "as available" basis.
+                You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately of any unauthorized access to your account.
               </p>
             </div>
 
             <div>
-              <h3>4. Limitation of Liability</h3>
+              <h3>4. Acceptable Use</h3>
               <p>
-                To the maximum extent permitted by applicable law, PantryPulse shall not be liable for direct, indirect, incidental, or consequential damages resulting from your use of or inability to use the service, including data loss or reliance on expiry estimates.
+                You agree not to misuse PantryPulse, reverse-engineer system endpoints, or attempt unauthorized database operations. We reserve the right to suspend accounts that violate platform policies.
               </p>
             </div>
 
             <div>
-              <h3>5. Data Accuracy & Food Safety Disclaimer</h3>
+              <h3>5. Support & Legal Inquiries</h3>
               <p>
-                You are responsible for the accuracy of product dates entered into the application. PantryPulse provides storage, expiry, and planning estimates only. It does not determine whether food is safe to consume. When uncertain, discard the product and follow official food-safety guidance. Refer to our{" "}
-                <Link href="/food-safety" className="link-text" style={{ fontWeight: 600 }}>
-                  Food Safety Disclaimer
-                </Link>{" "}
-                for detailed guidance.
+                If you have questions regarding these terms, send a support inquiry directly via Gmail or email:
               </p>
-            </div>
-
-            <div>
-              <h3>6. Account Termination</h3>
-              <p>
-                You may terminate your account at any time via the Settings page. We reserve the right to suspend or terminate accounts that violate acceptable use guidelines.
-              </p>
-            </div>
-
-            <div>
-              <h3>7. Official Support</h3>
-              <p>
-                Support requests are usually reviewed within 24–48 business hours. Contact support at:{" "}
-                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="link-text" style={{ fontWeight: 600 }}>
-                  {supportEmail}
+              <div style={{ marginTop: "0.75rem" }}>
+                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="button button-soft button-small" style={{ gap: "0.4rem" }}>
+                  Contact Support <ExternalLink size={14} />
                 </a>
-                .
-              </p>
+              </div>
             </div>
           </section>
         </article>
@@ -104,6 +85,9 @@ export default function TermsPage() {
       <footer className="landing-footer">
         <Logo />
         <p>© 2026 PantryPulse. Track food. Save money. Waste less.</p>
+        <Link href="/support" className="link-text" style={{ fontSize: "0.78rem" }}>
+          Contact Support
+        </Link>
       </footer>
     </div>
   );

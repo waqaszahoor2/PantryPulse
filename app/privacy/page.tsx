@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ExternalLink, LockKeyhole } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { HeaderBackButton } from "@/components/ui/header-back-button";
 import { buildGmailComposeUrl, getFixedSupportEmail } from "@/lib/support/build-email-links";
 
 export const metadata = {
@@ -21,96 +22,67 @@ export default function PrivacyPage() {
 
   return (
     <div className="landing-shell">
-      <header className="landing-header">
+      <header className="landing-header" style={{ padding: "0.75rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Link href="/" className="button button-ghost button-small">
-          <ArrowLeft size={16} /> Back to home
-        </Link>
+        <HeaderBackButton />
       </header>
 
       <main style={{ maxWidth: "800px", margin: "2rem auto", padding: "0 1.5rem" }}>
         <article className="panel" style={{ padding: "2.5rem" }}>
           <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <ShieldCheck size={16} /> Privacy & Security
+            <LockKeyhole size={18} /> Household Data Security
           </div>
           <h1 style={{ fontSize: "2.2rem", margin: "0.5rem 0 1.5rem" }}>Privacy Policy</h1>
-          <p className="muted" style={{ marginBottom: "2rem" }}>Last updated: August 2026</p>
 
-          <section style={{ display: "flex", flexDirection: "column", gap: "1.5rem", lineHeight: "1.6" }}>
+          <p className="muted" style={{ fontSize: "0.9rem", marginBottom: "2rem" }}>
+            Last updated: August 2026. PantryPulse respects your household privacy and is committed to protecting your personal data.
+          </p>
+
+          <section style={{ display: "flex", flexDirection: "column", gap: "1.75rem", lineHeight: "1.6" }}>
             <div>
-              <h3>1. Information We Collect</h3>
+              <h3>1. Data Isolation & Security Architecture</h3>
               <p>
-                PantryPulse collects information necessary to provide household grocery tracking, expiry alerts, and waste reduction analytics. This includes:
+                Row Level Security policies are configured to prevent authenticated users from reading, modifying, or deleting another household’s data. Every query executed against our PostgreSQL backend is verified using standard JWT session tokens.
               </p>
-              <ul style={{ paddingLeft: "1.5rem", marginTop: "0.5rem" }}>
-                <li><strong>Account details:</strong> Email address, optional full name, household size, preferred currency, and country.</li>
-                <li><strong>Authentication & session details:</strong> Authentication and session information managed by Supabase.</li>
-                <li><strong>Pantry data:</strong> Product names, categories, quantities, purchase dates, expiry dates, storage locations, package opened status, and optional notes.</li>
-                <li><strong>Activity events:</strong> Actions such as adding, editing, consuming, wasting, donating items, or updating shopping items.</li>
+            </div>
+
+            <div>
+              <h3>2. Information We Collect</h3>
+              <ul style={{ paddingLeft: "1.25rem", display: "grid", gap: "0.5rem" }}>
+                <li><strong>Account Data:</strong> Email address and profile details (e.g. household name, currency code, country). Authentication and session information managed by Supabase.</li>
+                <li><strong>Pantry Records:</strong> Product names, categories, quantities, purchase dates, expiry dates, prices, and storage locations entered by you.</li>
+                <li><strong>Browser Storage & Local Preferences:</strong> Demonstration state in Demo mode, theme selection (Dark/Light mode), and cached active tabs are stored locally on your device using HTML5 LocalStorage.</li>
               </ul>
             </div>
 
             <div>
-              <h3>2. Purpose of Data Processing</h3>
+              <h3>3. Notification Permissions</h3>
               <p>
-                We process your data strictly to calculate planning urgency scores, render dashboard analytics, issue browser expiry notifications, and synchronize your household pantry items across your devices.
+                Browser reminders are generated locally while PantryPulse is open in your active browser. Background delivery depends on browser support and notification configuration. We do not track or sell your notification habits.
               </p>
             </div>
 
             <div>
-              <h3>3. How Supabase Stores Your Data</h3>
+              <h3>4. Third-Party Services</h3>
               <p>
-                Your data is stored securely in PostgreSQL database infrastructure hosted by Supabase. Access controls are enforced at the database level using <strong>Row Level Security (RLS)</strong>.
+                We do not sell, rent, or monetize your household data. We partner exclusively with established infrastructure providers:
               </p>
-            </div>
-
-            <div>
-              <h3>4. User Data Isolation & Admin Maintenance Access</h3>
-              <p>
-                Row Level Security policies are configured to prevent authenticated users from reading, modifying, or deleting another household’s data. Authorized system administrators may access database tables solely for infrastructure maintenance, data backup, security diagnostics, or technical troubleshooting.
-              </p>
-            </div>
-
-            <div>
-              <h3>5. Public Demo Storage</h3>
-              <p>
-                Demo changes remain in the current browser and are not added to a registered user’s Supabase account.
-              </p>
-            </div>
-
-            <div>
-              <h3>6. Data Export & Deletion Rights</h3>
-              <p>
-                You retain full ownership of your data. At any time within your Account Settings, you can:
-              </p>
-              <ul style={{ paddingLeft: "1.5rem", marginTop: "0.5rem" }}>
-                <li>Export all your pantry records, shopping list items, and activity history in structured <strong>JSON</strong> or <strong>CSV</strong> format.</li>
-                <li>Clear individual items, inventory history, or your complete pantry list instantly.</li>
-                <li>Perform permanent account deletion, which securely purges your user profile, pantry items, activity logs, and authentication records.</li>
+              <ul style={{ paddingLeft: "1.25rem", display: "grid", gap: "0.4rem", marginTop: "0.5rem" }}>
+                <li><strong>Supabase:</strong> Encrypted Database hosting and Authentication service.</li>
+                <li><strong>Vercel:</strong> Web application hosting and Serverless edge network.</li>
               </ul>
             </div>
 
             <div>
-              <h3>7. Browser Storage & Notification Permissions</h3>
+              <h3>5. Your Rights & Support Contact</h3>
               <p>
-                PantryPulse uses browser local storage strictly for saving local theme preferences and interactive demo state. Browser notification permissions are requested only when you explicitly enable expiry alerts in Settings. We do not use third-party tracking cookies or sell your personal information.
+                You may request account deletion or data exports at any time from your account settings page. For questions regarding our privacy practices, contact support:
               </p>
-            </div>
-
-            <div>
-              <h3>8. Contact Us</h3>
-              <p>
-                Support requests are usually reviewed within 24–48 business hours. For privacy inquiries or technical support, contact our support team at:{" "}
-                <a
-                  href={gmailUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link-text"
-                  style={{ fontWeight: 600 }}
-                >
-                  {supportEmail}
-                </a>.
-              </p>
+              <div style={{ marginTop: "0.75rem" }}>
+                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="button button-soft button-small" style={{ gap: "0.4rem" }}>
+                  Contact Privacy Support <ExternalLink size={14} />
+                </a>
+              </div>
             </div>
           </section>
         </article>
@@ -119,6 +91,9 @@ export default function PrivacyPage() {
       <footer className="landing-footer">
         <Logo />
         <p>© 2026 PantryPulse. Track food. Save money. Waste less.</p>
+        <Link href="/support" className="link-text" style={{ fontSize: "0.78rem" }}>
+          Contact Support
+        </Link>
       </footer>
     </div>
   );
