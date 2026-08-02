@@ -14,6 +14,7 @@ import { PantryProvider } from "@/lib/data/provider";
 import { DemoSidebar } from "@/components/navigation/DemoSidebar";
 import { DemoMobileNav } from "@/components/navigation/DemoMobileNav";
 import { HeaderBackButton } from "@/components/ui/header-back-button";
+import { PantryPageHeader } from "@/components/pantry/pantry-page-header";
 
 function DemoContent() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "pantry" | "recommendations" | "insights">("dashboard");
@@ -34,6 +35,25 @@ function DemoContent() {
 
   function resetDemo() {
     setItems(samplePantryItems);
+  }
+
+  function addDemoItem() {
+    const newItem: (typeof samplePantryItems)[number] = {
+      id: String(Date.now()),
+      productName: "Fresh Avocado",
+      category: "Produce",
+      quantity: 2,
+      unit: "Pieces",
+      price: 450,
+      purchaseDate: new Date().toISOString().slice(0, 10),
+      expiryDate: new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 10),
+      storageLocation: "Refrigerator",
+      opened: false,
+      status: "available",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setItems((cur) => [newItem, ...cur]);
   }
 
   return (
@@ -173,13 +193,7 @@ function DemoContent() {
 
           {activeTab === "pantry" && (
             <div className="page-stack">
-              <section className="page-heading-row">
-                <div>
-                  <p className="eyebrow">Demo Inventory</p>
-                  <h1>Sample Pantry</h1>
-                  <p>{available.length} sample items available.</p>
-                </div>
-              </section>
+              <PantryPageHeader count={available.length} isDemo onDemoAdd={addDemoItem} />
               <div className="product-grid">
                 {available.map((item) => {
                   const risk = calculateRisk(item);

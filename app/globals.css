@@ -225,6 +225,10 @@ button:hover:not(:disabled),
 .page-stack{display:grid;gap:1.3rem}
 .page-heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem}
 .page-heading-row p:last-child{margin-bottom:0}
+.pantry-header-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.pantry-add-button{min-height:44px;padding:.65rem 1.25rem;font-size:.9rem;font-weight:700;border-radius:12px;box-shadow:0 4px 14px var(--primary-glow);display:inline-flex;align-items:center;justify-content:center;gap:.5rem;white-space:nowrap;cursor:pointer;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+.pantry-add-button:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--primary-glow)}
+.pantry-add-button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 
 /* ── STAT CARDS ── */
 .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
@@ -686,9 +690,8 @@ button:hover:not(:disabled),
   .global-search{display:none}
   .profile-chip-copy{display:none}
   .profile-chip{border:0;padding:0}
-  .page-heading-row{align-items:flex-start}
-  .page-heading-row>.button{width:42px;padding:0;font-size:0}
-  .page-heading-row>.button svg{margin:0}
+  .pantry-header-row{display:flex;flex-direction:column;align-items:stretch;gap:.5rem}
+  .pantry-add-button{width:100%;min-height:48px;margin:16px 0;font-size:.95rem;display:flex!important;justify-content:center;align-items:center}
   .stats-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.25rem;gap:.75rem}
   .stat-card{min-width:220px;scroll-snap-align:start}
   .dashboard-grid{display:grid}

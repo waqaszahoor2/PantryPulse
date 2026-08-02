@@ -11,6 +11,8 @@ import { ItemEditor } from "@/components/pantry/item-editor";
 import { EmptyState } from "@/components/ui/empty-state";
 import { calculateRisk } from "@/lib/risk";
 
+import { PantryPageHeader } from "@/components/pantry/pantry-page-header";
+
 export default function PantryPage() {
   const { items, updateItem, deleteItem, markStatus } = usePantry();
   const [query, setQuery] = useState("");
@@ -60,16 +62,7 @@ export default function PantryPage() {
 
   return (
     <div className="page-stack">
-      <section className="page-heading-row">
-        <div>
-          <p className="eyebrow">Inventory</p>
-          <h1>My Pantry</h1>
-          <p>{available.length} product{available.length === 1 ? "" : "s"} currently stored in your household.</p>
-        </div>
-        <Link className="button button-primary" href="/add-item">
-          <CirclePlus size={18} /> Add grocery
-        </Link>
-      </section>
+      <PantryPageHeader count={available.length} />
 
       <section className="filter-panel">
         <label className="filter-search">
