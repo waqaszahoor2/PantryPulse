@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Camera, Download, FileSpreadsheet, HelpCircle, Lock, Mail, MessageSquare, RotateCcw, Send, ShieldCheck, Sparkles, Trash2, UserRound, X } from "lucide-react";
+import { Camera, Download, FileSpreadsheet, HelpCircle, Lock, Mail, RotateCcw, ShieldCheck, Sparkles, Trash2, UserRound, X } from "lucide-react";
 import { NotificationPermission } from "@/components/notifications/notification-permission";
 import { usePantry } from "@/lib/data/provider";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -13,7 +13,6 @@ export default function SettingsPage() {
   const {
     profile,
     updateUserProfile,
-    sendSupportInquiry,
     exportDataAsJSON,
     exportDataAsCSV,
     clearPantryData,
@@ -38,12 +37,6 @@ export default function SettingsPage() {
   const [fileError, setFileError] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  // Support Inquiry State
-  const [inquirySubject, setInquirySubject] = useState("");
-  const [inquiryBody, setInquiryBody] = useState("");
-  const [inquirySent, setInquirySent] = useState(false);
-  const [sendingInquiry, setSendingInquiry] = useState(false);
 
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
 
@@ -103,31 +96,6 @@ export default function SettingsPage() {
       setMessage(error instanceof Error ? error.message : "Unable to save profile.");
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function handleSendInquiry(e: React.FormEvent) {
-    e.preventDefault();
-    if (!inquiryBody.trim() || sendingInquiry) return;
-    setSendingInquiry(true);
-    try {
-      const subjectText = inquirySubject.trim() || "PantryPulse Support Inquiry";
-      const bodyText = inquiryBody.trim();
-
-      // 1. Dispatch in-app confirmation notification & record support event
-      await sendSupportInquiry(subjectText, bodyText);
-      setInquirySent(true);
-
-      // 2. Open email client with prefilled subject & body to reach Gmail directly
-      const mailtoUrl = `mailto:${supportEmail}?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
-      window.open(mailtoUrl, "_blank");
-
-      setInquirySubject("");
-      setInquiryBody("");
-    } catch {
-      alert("Unable to process support inquiry.");
-    } finally {
-      setSendingInquiry(false);
     }
   }
 
@@ -334,7 +302,7 @@ export default function SettingsPage() {
             <span><Mail /></span>
             <div>
               <h2>Support & Help Center</h2>
-              <p>Need assistance, have questions, or want to request a feature?</p>
+              <p>Need assistance or have privacy questions?</p>
             </div>
           </div>
 
@@ -343,39 +311,12 @@ export default function SettingsPage() {
             <a href={`mailto:${supportEmail}`} className="link-text">{supportEmail}</a>
           </div>
 
-          {/* Quick Support Message Form */}
-          <form onSubmit={handleSendInquiry} style={{ display: "grid", gap: "0.65rem", padding: "0.85rem", background: "var(--surface-soft)", borderRadius: "12px", border: "1px solid var(--line)" }}>
-            <span style={{ fontSize: "0.8rem", fontWeight: 750, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-              <MessageSquare size={16} /> Send Direct Message to Support
-            </span>
-
-            {inquirySent && (
-              <p className="form-message success" style={{ fontSize: "0.75rem", margin: 0 }}>
-                Query sent! A default confirmation notification has been posted to your account notifications feed.
-              </p>
-            )}
-
-            <input
-              placeholder="Subject (e.g. Question about risk score)"
-              value={inquirySubject}
-              onChange={(e) => setInquirySubject(e.target.value)}
-              style={{ fontSize: "0.82rem" }}
-            />
-            <textarea
-              required
-              rows={3}
-              placeholder="Type your message or question here…"
-              value={inquiryBody}
-              onChange={(e) => setInquiryBody(e.target.value)}
-              style={{ fontSize: "0.82rem", resize: "none" }}
-            />
-            <button type="submit" className="button button-primary button-small" disabled={sendingInquiry} style={{ justifySelf: "start" }}>
-              <Send size={14} /> {sendingInquiry ? "Sending…" : "Send Message"}
-            </button>
-          </form>
+          <p className="muted" style={{ margin: 0, fontSize: "0.78rem" }}>
+            Support queries are handled directly via email.
+          </p>
 
           {/* Knowledge Base & FAQs */}
-          <div style={{ display: "grid", gap: "0.6rem" }}>
+          <div style={{ display: "grid", gap: "0.6rem", marginTop: "0.5rem" }}>
             <span style={{ fontSize: "0.8rem", fontWeight: 750, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
               <HelpCircle size={16} /> Quick Answers & Security
             </span>
