@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Bell, ChartNoAxesColumnIncreasing, CirclePlus, Gauge, Info, Lightbulb, PackageSearch, Settings, ShoppingBasket, Sparkles } from "lucide-react";
+import { ArrowRight, ChartNoAxesColumnIncreasing, CirclePlus, Gauge, Info, Lightbulb, PackageSearch, RotateCcw, Sparkles } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { samplePantryItems } from "@/lib/data/mock";
-import { calculateRisk, expiryLabel, formatCurrency } from "@/lib/risk";
+import { calculateRisk, expiryLabel } from "@/lib/risk";
+import { formatCurrency } from "@/lib/currency";
 import { PRODUCT_EMOJI } from "@/lib/constants";
 import { OutcomeChart, WeeklyWasteChart, CategoryWasteChart } from "@/components/charts/dashboard-charts";
 import { PantryProvider } from "@/lib/data/provider";
@@ -25,7 +26,11 @@ function DemoContent() {
   const atRiskValue = ranked.filter(({ risk }) => risk.level === "high" || risk.level === "expired").reduce((sum, { item }) => sum + item.price, 0);
 
   function markDemoConsumed(id: string) {
-    setItems((cur) => cur.map((item) => item.id === id ? { ...item, status: "consumed", statusDate: new Date().toISOString().slice(0, 10) } : item));
+    setItems((cur) => cur.map((item) => (item.id === id ? { ...item, status: "consumed", statusDate: new Date().toISOString().slice(0, 10) } : item)));
+  }
+
+  function resetDemo() {
+    setItems(samplePantryItems);
   }
 
   return (
@@ -34,11 +39,16 @@ function DemoContent() {
       <div style={{ background: "#eef7f2", borderBottom: "1px solid #cce8d8", color: "#0f7d53", padding: "0.6rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.88rem", fontWeight: 500 }}>
           <Info size={18} />
-          <span><strong>Sample demonstration data</strong> — Explore PantryPulse without creating an account. Changes are held locally in your browser.</span>
+          <span><strong>Sample demonstration data</strong> — Demo changes remain in the current browser and are not added to a registered user's Supabase account.</span>
         </div>
-        <Link href="/signup" className="button button-primary button-small" style={{ gap: "0.35rem" }}>
-          Create your free account <Sparkles size={14} />
-        </Link>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <button type="button" onClick={resetDemo} className="button button-ghost button-small" style={{ gap: "0.3rem" }}>
+            <RotateCcw size={14} /> Reset Demo
+          </button>
+          <Link href="/signup" className="button button-primary button-small" style={{ gap: "0.35rem" }}>
+            Create your free account <Sparkles size={14} />
+          </Link>
+        </div>
       </div>
 
       {/* Navigation Header */}
@@ -76,7 +86,7 @@ function DemoContent() {
               <div>
                 <p className="eyebrow">Sample Overview</p>
                 <h1>Good morning, Demo Household <span aria-hidden="true">👋</span></h1>
-                <p>Review what needs attention in your demonstration pantry today.</p>
+                <p>Review what needs attention in your demonstration pantry today. Sample figures use PKR formatting.</p>
               </div>
               <Link href="/signup" className="button button-primary">
                 <CirclePlus size={18} /> Start Your Pantry
@@ -151,6 +161,9 @@ function DemoContent() {
                   </div>
                 </div>
                 <OutcomeChart />
+                <small className="muted" style={{ display: "block", marginTop: "0.5rem", fontSize: "0.72rem" }}>
+                  Demo efficiency is calculated as (consumed items / total resolved items) × 100% based on sample records held in your local browser.
+                </small>
               </article>
             </section>
           </div>
@@ -217,7 +230,7 @@ function DemoContent() {
               <div>
                 <p className="eyebrow">Demo Analytics</p>
                 <h1>Household Insights</h1>
-                <p>Overview of food outcomes and waste prevention.</p>
+                <p>Overview of sample food outcomes and waste prevention.</p>
               </div>
             </section>
             <div className="dashboard-grid top">

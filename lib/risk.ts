@@ -1,4 +1,7 @@
 import type { PantryItem, RiskResult } from "@/lib/types";
+import { formatCurrency } from "@/lib/currency";
+
+export { formatCurrency };
 
 const DAY_MS = 86_400_000;
 
@@ -23,7 +26,7 @@ export function calculateRisk(item: PantryItem, similarAvailableCount = 0): Risk
       level: "expired",
       daysRemaining,
       reasons: ["The recorded expiry date has passed."],
-      action: "Review package label and discard if quality or safety is uncertain.",
+      action: "Review package label, storage duration, and official guidance. Discard if quality, odor, texture, or packaging is questionable.",
     };
   }
 
@@ -65,10 +68,10 @@ export function calculateRisk(item: PantryItem, similarAvailableCount = 0): Risk
   score = Math.min(100, Math.max(0, score));
   const level = score >= 70 ? "high" : score >= 40 ? "medium" : "low";
   const action = level === "high"
-    ? "Plan to consume, freeze, or donate this item soon."
+    ? "High planning priority: Plan to consume, freeze, or donate this item soon."
     : level === "medium"
-      ? "Keep this item visible and plan to use it this week."
-      : "No immediate action required.";
+      ? "Expiry attention: Keep visible and plan to use this week."
+      : "No immediate planning action required.";
 
   if (reasons.length === 0) reasons.push("Sufficient shelf life remaining.");
   return { score, level, daysRemaining, reasons, action };
@@ -79,18 +82,4 @@ export function expiryLabel(daysRemaining: number): string {
   if (daysRemaining === 0) return "Expires today";
   if (daysRemaining === 1) return "Expires tomorrow";
   return `Expires in ${daysRemaining} days`;
-}
-
-export function formatCurrency(amount: number, currency = "PKR"): string {
-  try {
-    if (currency === "PKR") {
-      return `PKR ${amount.toLocaleString("en-PK", { maximumFractionDigits: 2 })}`;
-    }
-    if (currency === "INR") {
-      return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
-    }
-    return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString()}`;
-  }
 }

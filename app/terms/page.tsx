@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { buildGmailComposeUrl, getFixedSupportEmail } from "@/lib/support/build-email-links";
 
 export const metadata = {
   title: "Terms of Service",
@@ -8,7 +9,15 @@ export const metadata = {
 };
 
 export default function TermsPage() {
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
+  const supportEmail = getFixedSupportEmail();
+  const gmailUrl = buildGmailComposeUrl({
+    recipient: supportEmail,
+    fullName: "PantryPulse User",
+    email: supportEmail,
+    category: "General feedback",
+    subject: "Terms of Service Query",
+    message: "I have a question regarding the Terms of Service.",
+  });
 
   return (
     <div className="landing-shell">
@@ -38,7 +47,11 @@ export default function TermsPage() {
             <div>
               <h3>2. Account Security & Responsibilities</h3>
               <p>
-                You are responsible for maintaining the confidentiality of your login credentials and for all activities conducted under your household account. Notify us immediately at <a href={`mailto:${supportEmail}`} className="link-text">{supportEmail}</a> if you suspect unauthorized access.
+                You are responsible for maintaining the confidentiality of your login credentials and for all activities conducted under your household account. Notify us immediately at{" "}
+                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="link-text" style={{ fontWeight: 600 }}>
+                  {supportEmail}
+                </a>{" "}
+                if you suspect unauthorized access.
               </p>
             </div>
 
@@ -59,7 +72,11 @@ export default function TermsPage() {
             <div>
               <h3>5. Data Accuracy & Food Safety Disclaimer</h3>
               <p>
-                You are responsible for the accuracy of product dates entered into the application. PantryPulse provides planning estimates only and does not replace official food safety instructions or sensory inspection. Refer to our <Link href="/food-safety" className="link-text">Food Safety Disclaimer</Link> for detailed guidance.
+                You are responsible for the accuracy of product dates entered into the application. PantryPulse provides storage, expiry, and planning estimates only. It does not determine whether food is safe to consume. When uncertain, discard the product and follow official food-safety guidance. Refer to our{" "}
+                <Link href="/food-safety" className="link-text" style={{ fontWeight: 600 }}>
+                  Food Safety Disclaimer
+                </Link>{" "}
+                for detailed guidance.
               </p>
             </div>
 
@@ -67,6 +84,17 @@ export default function TermsPage() {
               <h3>6. Account Termination</h3>
               <p>
                 You may terminate your account at any time via the Settings page. We reserve the right to suspend or terminate accounts that violate acceptable use guidelines.
+              </p>
+            </div>
+
+            <div>
+              <h3>7. Official Support</h3>
+              <p>
+                Support requests are usually reviewed within 24–48 business hours. Contact support at:{" "}
+                <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="link-text" style={{ fontWeight: 600 }}>
+                  {supportEmail}
+                </a>
+                .
               </p>
             </div>
           </section>

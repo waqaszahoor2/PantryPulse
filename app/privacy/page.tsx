@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ExternalLink, LockKeyhole, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { buildGmailComposeUrl, getFixedSupportEmail } from "@/lib/support/build-email-links";
 
 export const metadata = {
   title: "Privacy Policy",
@@ -8,7 +9,15 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@pantrypulse.app";
+  const supportEmail = getFixedSupportEmail();
+  const gmailUrl = buildGmailComposeUrl({
+    recipient: supportEmail,
+    fullName: "PantryPulse User",
+    email: supportEmail,
+    category: "Privacy or data request",
+    subject: "Privacy Policy Inquiry",
+    message: "I have a question regarding the Privacy Policy or my personal data.",
+  });
 
   return (
     <div className="landing-shell">
@@ -34,7 +43,8 @@ export default function PrivacyPage() {
                 PantryPulse collects information necessary to provide household grocery tracking, expiry alerts, and waste reduction analytics. This includes:
               </p>
               <ul style={{ paddingLeft: "1.5rem", marginTop: "0.5rem" }}>
-                <li><strong>Account details:</strong> Email address, encrypted authentication tokens, optional full name, household size, preferred currency, and country.</li>
+                <li><strong>Account details:</strong> Email address, optional full name, household size, preferred currency, and country.</li>
+                <li><strong>Authentication & session details:</strong> Authentication and session information managed by Supabase.</li>
                 <li><strong>Pantry data:</strong> Product names, categories, quantities, purchase dates, expiry dates, storage locations, package opened status, and optional notes.</li>
                 <li><strong>Activity events:</strong> Actions such as adding, editing, consuming, wasting, donating items, or updating shopping items.</li>
               </ul>
@@ -43,26 +53,33 @@ export default function PrivacyPage() {
             <div>
               <h3>2. Purpose of Data Processing</h3>
               <p>
-                We process your data strictly to calculate risk urgency scores, render dashboard analytics, issue expiry notifications, and synchronize your household pantry items across your devices.
+                We process your data strictly to calculate planning urgency scores, render dashboard analytics, issue browser expiry notifications, and synchronize your household pantry items across your devices.
               </p>
             </div>
 
             <div>
               <h3>3. How Supabase Stores Your Data</h3>
               <p>
-                Your data is stored securely in PostgreSQL database infrastructure hosted by Supabase. Access controls are strictly enforced at the database level using <strong>Row Level Security (RLS)</strong>.
+                Your data is stored securely in PostgreSQL database infrastructure hosted by Supabase. Access controls are enforced at the database level using <strong>Row Level Security (RLS)</strong>.
               </p>
             </div>
 
             <div>
               <h3>4. User Data Isolation & Admin Maintenance Access</h3>
               <p>
-                Row Level Security policies guarantee that users cannot read, modify, or delete another household’s data. Authorized system administrators may access limited database tables solely for infrastructure maintenance, data backup, security diagnostics, or technical troubleshooting.
+                Row Level Security policies are configured to prevent authenticated users from reading, modifying, or deleting another household’s data. Authorized system administrators may access database tables solely for infrastructure maintenance, data backup, security diagnostics, or technical troubleshooting.
               </p>
             </div>
 
             <div>
-              <h3>5. Data Export & Deletion Rights</h3>
+              <h3>5. Public Demo Storage</h3>
+              <p>
+                Demo changes remain in the current browser and are not added to a registered user’s Supabase account.
+              </p>
+            </div>
+
+            <div>
+              <h3>6. Data Export & Deletion Rights</h3>
               <p>
                 You retain full ownership of your data. At any time within your Account Settings, you can:
               </p>
@@ -74,18 +91,18 @@ export default function PrivacyPage() {
             </div>
 
             <div>
-              <h3>6. Cookies & Session Management</h3>
+              <h3>7. Browser Storage & Notification Permissions</h3>
               <p>
-                PantryPulse uses secure HTTP-only cookies and local browser storage strictly for authenticating your active session and saving local theme preferences. We do not use third-party tracking cookies or sell your personal information.
+                PantryPulse uses browser local storage strictly for saving local theme preferences and interactive demo state. Browser notification permissions are requested only when you explicitly enable expiry alerts in Settings. We do not use third-party tracking cookies or sell your personal information.
               </p>
             </div>
 
             <div>
-              <h3>7. Contact Us</h3>
+              <h3>8. Contact Us</h3>
               <p>
-                For privacy inquiries or technical support, contact our support team at:{" "}
+                Support requests are usually reviewed within 24–48 business hours. For privacy inquiries or technical support, contact our support team at:{" "}
                 <a
-                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(supportEmail)}&su=${encodeURIComponent("PantryPulse Privacy Inquiry")}`}
+                  href={gmailUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-text"

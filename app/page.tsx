@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BellRing, ChartNoAxesColumnIncreasing, CheckCircle2, Leaf, LockKeyhole, ShoppingBasket, Sparkles } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { formatCurrency } from "@/lib/currency";
 
 const features = [
   { icon: ShoppingBasket, title: "Track groceries", text: "Keep quantities, prices, storage locations, and expiry dates organized in one place." },
@@ -72,7 +73,7 @@ export default function LandingPage() {
               </div>
               <div className="danger">
                 <small>Value at risk</small>
-                <strong>$18.40</strong>
+                <strong>{formatCurrency(1840, "PKR")}</strong>
               </div>
             </div>
             <div className="preview-panel">

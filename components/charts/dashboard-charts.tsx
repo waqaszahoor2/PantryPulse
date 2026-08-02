@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Bar, BarChart } from "recharts";
 import { usePantry } from "@/lib/data/provider";
-import { formatCurrency } from "@/lib/risk";
+import { formatCurrency } from "@/lib/currency";
 
 export function OutcomeChart() {
   const { items, profile } = usePantry();

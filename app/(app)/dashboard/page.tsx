@@ -8,7 +8,8 @@ import { useExpiryNotifications } from "@/components/notifications/notification-
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { PRODUCT_EMOJI } from "@/lib/constants";
 import { usePantry } from "@/lib/data/provider";
-import { calculateRisk, expiryLabel, formatCurrency } from "@/lib/risk";
+import { calculateRisk, expiryLabel } from "@/lib/risk";
+import { formatCurrency } from "@/lib/currency";
 
 function getGreeting(hour: number): string {
   if (hour < 12) return "Good morning";

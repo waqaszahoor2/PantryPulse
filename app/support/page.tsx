@@ -1,26 +1,45 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Clock, HelpCircle, Lock, Mail, MessageSquare, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { SupportForm } from "@/components/support/SupportForm";
 import { getFixedSupportEmail } from "@/lib/support/build-email-links";
-
-export const metadata: Metadata = {
-  title: "Contact Support | PantryPulse",
-  description: "Get assistance, report issues, or submit feedback to the PantryPulse team.",
-};
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function SupportPage() {
   const supportEmail = getFixedSupportEmail();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    async function checkAuth() {
+      if (!isSupabaseConfigured()) return;
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(Boolean(session));
+      } catch {
+        setIsAuthenticated(false);
+      }
+    }
+    checkAuth();
+  }, []);
 
   return (
     <div className="landing-shell">
       <header className="landing-header">
         <Logo />
         <div style={{ marginLeft: "auto", display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/dashboard" className="button button-ghost button-small">
-            <ArrowLeft size={16} /> Back to dashboard
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard" className="button button-ghost button-small">
+              <ArrowLeft size={16} /> Back to dashboard
+            </Link>
+          ) : (
+            <Link href="/" className="button button-ghost button-small">
+              <ArrowLeft size={16} /> Back to home
+            </Link>
+          )}
         </div>
       </header>
 
@@ -80,7 +99,7 @@ export default function SupportPage() {
                   <Clock size={16} style={{ color: "var(--primary)" }} /> Estimated Response Time
                 </strong>
                 <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--muted)" }}>
-                  Our team typically reviews and responds to inquiries within 24 to 48 business hours.
+                  Support requests are usually reviewed within 24–48 business hours.
                 </p>
               </div>
 
