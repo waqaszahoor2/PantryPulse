@@ -194,8 +194,8 @@ export function PantryProvider({ children }: { children: ReactNode }) {
             householdSize: Number(profData.household_size || 1),
             currency: String(profData.currency || "PKR"),
             country: String(profData.country || "PK"),
-            gender: String(profData.gender || "Prefer not to say"),
-            avatarUrl: profData.avatar_url ? String(profData.avatar_url) : "",
+            gender: String((profData as Record<string, unknown>).gender || "Prefer not to say"),
+            avatarUrl: (profData as Record<string, unknown>).avatar_url ? String((profData as Record<string, unknown>).avatar_url) : "",
             email: user.email || "",
             createdAt: String(profData.created_at),
             updatedAt: String(profData.updated_at),
@@ -379,8 +379,23 @@ export function PantryProvider({ children }: { children: ReactNode }) {
       if (patch.gender !== undefined) row.gender = patch.gender;
       if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
 
-      const { data, error } = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
-      if (error) throw new Error(error.message || "Failed to update profile.");
+      let data = null;
+      let error = null;
+
+      const res = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
+      data = res.data;
+      error = res.error;
+
+      // Graceful fallback if database schema cache lacks avatar_url or gender columns
+      if (error && (error.message?.includes("avatar_url") || error.message?.includes("gender") || error.message?.includes("schema cache") || error.code === "PGRST204")) {
+        delete row.avatar_url;
+        delete row.gender;
+        const retry = await supabase.from("profiles").upsert({ id: user.id, ...row }).select().single();
+        data = retry.data;
+        if (retry.error) throw new Error(retry.error.message || "Failed to update profile.");
+      } else if (error) {
+        throw new Error(error.message || "Failed to update profile.");
+      }
 
       setProfile({
         id: String(data.id),
@@ -388,8 +403,8 @@ export function PantryProvider({ children }: { children: ReactNode }) {
         householdSize: Number(data.household_size || 1),
         currency: String(data.currency || "PKR"),
         country: String(data.country || "PK"),
-        gender: String(data.gender || patch.gender || "Prefer not to say"),
-        avatarUrl: data.avatar_url ? String(data.avatar_url) : patch.avatarUrl || "",
+        gender: String((data as Record<string, unknown>).gender || patch.gender || "Prefer not to say"),
+        avatarUrl: (data as Record<string, unknown>).avatar_url ? String((data as Record<string, unknown>).avatar_url) : patch.avatarUrl || "",
         email: user.email || "",
         createdAt: String(data.created_at),
         updatedAt: String(data.updated_at),
