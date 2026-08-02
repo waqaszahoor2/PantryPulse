@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Bell, ChartNoAxesColumnIncreasing, CirclePlus, ClipboardList, Gauge, Lightbulb, LogOut, Menu, PackageSearch, Search, Settings, ShoppingBasket, X } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationPermission } from "@/components/notifications/notification-permission";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { usePantry } from "@/lib/data/provider";
@@ -57,6 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <label className="global-search"><Search size={17} /><input aria-label="Search PantryPulse" placeholder="Search food, categories, pages…" /></label>
           <div className="topbar-actions">
             <NotificationPermission compact />
+            <ThemeToggle />
             <Link className="icon-button notification-button" href="/notifications" aria-label={`${unread} unread notifications`}><Bell size={18} />{unread > 0 && <span className="notification-dot">{unread}</span>}</Link>
             <div className="profile-chip"><span className="avatar">A</span><span><strong>Ali</strong><small>{mode === "demo" ? "Demo account" : "Household"}</small></span></div>
           </div>
